@@ -1,41 +1,41 @@
-import { auth } from './firebase.js';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { supabase } from './supabase.js';
 
 // Guard — redirect to login if not authenticated
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
+supabase.auth.getSession().then(({ data: { session } }) => {
+  if (!session) {
     window.location.href = 'login.html';
     return;
   }
-  renderUser(user);
+  renderUser(session.user);
 });
 
 function renderUser(user) {
-  document.getElementById('user-name').textContent =
-    user.displayName || user.email.split('@')[0];
+  const meta = user.user_metadata || {};
+  const displayName = meta.full_name || meta.name || user.email.split('@')[0];
+
+  document.getElementById('user-name').textContent  = displayName;
   document.getElementById('user-email').textContent = user.email;
 
-  const avatar = document.getElementById('user-avatar');
+  const avatar   = document.getElementById('user-avatar');
   const fallback = document.getElementById('user-avatar-fallback');
+  const avatarUrl = meta.avatar_url || meta.picture;
 
-  if (user.photoURL) {
-    avatar.src = user.photoURL;
-    avatar.style.display = 'block';
-    fallback.style.display = 'none';
+  if (avatarUrl) {
+    avatar.src = avatarUrl;
+    avatar.style.display    = 'block';
+    fallback.style.display  = 'none';
   } else {
-    const initial = (user.displayName || user.email)[0].toUpperCase();
-    fallback.textContent = initial;
+    fallback.textContent   = displayName[0].toUpperCase();
     fallback.style.display = 'flex';
-    avatar.style.display = 'none';
+    avatar.style.display   = 'none';
   }
 
-  // Show provider badge
-  const providers = user.providerData.map(p => p.providerId);
-  const badge = document.getElementById('provider-badge');
-  badge.textContent = providers.includes('google.com') ? 'Google Account' : 'Email Account';
+  const provider = user.app_metadata?.provider || 'email';
+  document.getElementById('provider-badge').textContent =
+    provider === 'google' ? 'Google Account' : 'Email Account';
 }
 
 document.getElementById('btn-signout').addEventListener('click', async () => {
-  await signOut(auth);
+  await supabase.auth.signOut();
   window.location.href = 'index.html';
 });
