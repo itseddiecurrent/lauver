@@ -4,7 +4,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 // Guard — redirect to login if not authenticated
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     return;
   }
   renderUser(user);
@@ -37,5 +37,5 @@ function renderUser(user) {
 
 document.getElementById('btn-signout').addEventListener('click', async () => {
   await signOut(auth);
-  window.location.href = '/';
+  window.location.href = 'index.html';
 });

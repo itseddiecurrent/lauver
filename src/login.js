@@ -10,7 +10,7 @@ import {
 
 // Already logged in → go to dashboard
 onAuthStateChanged(auth, (user) => {
-  if (user) window.location.href = '/dashboard.html';
+  if (user) window.location.href = 'dashboard.html';
 });
 
 const provider = new GoogleAuthProvider();
@@ -54,7 +54,7 @@ document.getElementById('btn-google').addEventListener('click', async () => {
   setLoading(true, 'btn-google');
   try {
     await signInWithPopup(auth, provider);
-    window.location.href = '/dashboard.html';
+    window.location.href = 'dashboard.html';
   } catch (err) {
     setLoading(false, 'btn-google');
     showError(friendlyError(err.code));
@@ -77,7 +77,7 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       if (name) await updateProfile(user, { displayName: name });
     }
-    window.location.href = '/dashboard.html';
+    window.location.href = 'dashboard.html';
   } catch (err) {
     setLoading(false, 'submit-btn');
     showError(friendlyError(err.code));
