@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lauver.ai — Find Your Pack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          oklch(99% 0.007 75);
+      --surface:     oklch(96% 0.015 72);
+      --border:      oklch(90% 0.022 70);
+      --orange:      oklch(63% 0.22 43);
+      --orange-dark: oklch(29% 0.16 42);
+      --yellow:      oklch(80% 0.19 80);
+      --yellow-soft: oklch(93% 0.08 82);
+      --text:        oklch(16% 0.04 45);
+      --text-mid:    oklch(40% 0.06 48);
+      --text-light:  oklch(62% 0.04 50);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ─────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: padding .35s ease, background .35s ease, border-color .35s ease;
+      border-bottom: 1px solid transparent;
+    }
+    nav.scrolled {
+      background: color-mix(in oklch, var(--bg) 90%, transparent);
+      backdrop-filter: blur(14px);
+      padding: .8rem 2.5rem;
+      border-bottom-color: var(--border);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-logo img {
+      height: 52px;
+      width: auto;
+      display: block;
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-mid);
+      font-size: .82rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-cta {
+      background: var(--orange) !important;
+      color: var(--bg) !important;
+      padding: .55rem 1.4rem;
+      border-radius: 2rem;
+      transition: background .2s !important;
+    }
+    .nav-cta:hover { background: var(--yellow) !important; color: var(--orange-dark) !important; }
+
+    /* ── HERO ─────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 2.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(ellipse 70% 60% at 0% 0%,
+        color-mix(in oklch, var(--yellow) 22%, transparent) 0%,
+        transparent 100%);
+    }
+    .hero-inner {
+      display: flex;
+      align-items: center;
+      gap: clamp(2.5rem, 5vw, 5rem);
+    }
+    .hero-content {
+      flex: 0 0 auto;
+      width: clamp(300px, 44vw, 580px);
+    }
+    .hero-visual {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-logo-wrap {
+      width: clamp(240px, 30vw, 390px);
+      height: clamp(240px, 30vw, 390px);
+      background: radial-gradient(circle,
+        color-mix(in oklch, var(--yellow) 32%, transparent) 0%,
+        transparent 68%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-logo-img {
+      width: clamp(220px, 28vw, 350px);
+      height: auto;
+      filter: drop-shadow(0 8px 36px oklch(63% 0.22 43 / 0.32));
+      animation: floatLogo 5s ease-in-out infinite;
+    }
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-16px); }
+    }
+
+    /* ── HERO DECORATIVE RINGS ─────────────────── */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: clamp(400px, 55vw, 780px);
+      height: clamp(400px, 55vw, 780px);
+      border: 1.5px solid color-mix(in oklch, var(--orange) 10%, transparent);
+      border-radius: 50%;
+      top: 50%; right: -8%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: clamp(280px, 38vw, 540px);
+      height: clamp(280px, 38vw, 540px);
+      border: 1px solid color-mix(in oklch, var(--yellow) 30%, transparent);
+      border-radius: 50%;
+      top: 50%; right: -2%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    /* ── SPORT TAGS ────────────────────────────── */
+    .sport-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      margin-top: 1.6rem;
+    }
+    .sport-tag {
+      background: color-mix(in oklch, var(--orange) 7%, var(--bg));
+      border: 1px solid color-mix(in oklch, var(--orange) 18%, transparent);
+      color: var(--orange-dark);
+      font-size: .72rem;
+      font-weight: 600;
+      padding: .28rem .75rem;
+      border-radius: 2rem;
+      white-space: nowrap;
+      letter-spacing: .02em;
+      transition: background .2s, border-color .2s;
+    }
+    .sport-tag:hover {
+      background: color-mix(in oklch, var(--orange) 14%, var(--bg));
+      border-color: color-mix(in oklch, var(--orange) 35%, transparent);
+    }
+    .sport-tag-more {
+      color: var(--orange);
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .28rem .5rem;
+      letter-spacing: .02em;
+      align-self: center;
+    }
+
+    /* ── STAT BUBBLES ──────────────────────────── */
+    .hero-visual { position: relative; }
+    .h-bubble {
+      position: absolute;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: .8rem;
+      padding: .72rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      box-shadow: 0 4px 18px oklch(20% 0.08 45 / .09);
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .h-bubble-1 { top: -0.5rem; right: -2.2rem; animation: floatB 5s ease-in-out infinite; }
+    .h-bubble-2 { bottom: 0.8rem; left: -3.2rem; animation: floatA 5.5s ease-in-out infinite; animation-delay: -.9s; }
+    .h-bubble-3 { top: 47%; right: -3.6rem; animation: floatA 4.5s ease-in-out infinite; animation-delay: -.4s; }
+    .bubble-icon { font-size: 1rem; line-height: 1; }
+    .bubble-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: .96rem;
+      color: var(--orange);
+      line-height: 1;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+    .bubble-label {
+      font-size: .66rem;
+      font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: .03em;
+      margin-top: .15rem;
+    }
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: color-mix(in oklch, var(--yellow) 22%, var(--bg));
+      border: 1px solid color-mix(in oklch, var(--yellow) 45%, transparent);
+      color: var(--orange-dark);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .4rem 1rem;
+      border-radius: 2rem;
+      margin-bottom: 2rem;
+    }
+    .tag-pill::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .6; transform: scale(.7); }
+    }
+    .hero-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(4rem, 8.5vw, 8rem);
+      line-height: .9;
+      letter-spacing: -.01em;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+    }
+    .hero-headline .accent { color: var(--orange); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-mid);
+      max-width: 480px;
+      margin-top: 1.2rem;
+      margin-bottom: 2rem;
+      line-height: 1.55;
+      font-weight: 500;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    .btn-primary {
+      background: var(--orange);
+      color: var(--bg);
+      padding: .9rem 2.2rem;
+      border-radius: 3rem;
+      font-weight: 700;
+      font-size: .93rem;
+      text-decoration: none;
+      letter-spacing: .03em;
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      transition: background .25s, transform .2s;
+    }
+    .btn-primary:hover { background: var(--orange-dark); transform: translateY(-2px); }
+    .btn-ghost {
+      color: var(--text-mid);
+      font-weight: 600;
+      font-size: .93rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      letter-spacing: .02em;
+      transition: color .2s, gap .2s;
+    }
+    .btn-ghost:hover { color: var(--orange); gap: .7rem; }
+    .hero-stats {
+      display: flex;
+      gap: 3.5rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .hero-stats > div { max-width: 210px; }
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(1.35rem, 2.9vw, 2rem);
+      color: var(--orange);
+      letter-spacing: -.01em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .stat-label {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: .04em;
+      margin-top: .45rem;
+    }
+
+    /* ── SECTION SHARED ───────────────────────── */
+    section { padding: clamp(4.5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem); }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .82rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 2px;
+      background: var(--orange);
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 5.5vw, 5rem);
+      line-height: .92;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      margin-bottom: .25em;
+    }
+    .section-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-mid);
+      max-width: 500px;
+      line-height: 1.65;
+    }
+
+    /* ── ABOUT ────────────────────────────────── */
+    .about { background: var(--orange-dark); }
+    .about-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .about .section-label { color: var(--yellow); }
+    .about .section-label::before { background: var(--yellow); }
+    .about .section-title { color: var(--bg); }
+    .about-body { color: oklch(84% 0.035 68); font-size: 1rem; line-height: 1.75; }
+    .about-body p + p { margin-top: 1.1rem; }
+
+    .pillars { display: flex; flex-direction: column; gap: 2.2rem; }
+    .pillar { display: flex; gap: 1.4rem; align-items: flex-start; }
+    .pillar-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 3.8rem;
+      color: var(--yellow);
+      line-height: .95;
+      flex-shrink: 0;
+      width: 2.5rem;
+    }
+    .pillar h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--bg);
+      margin-bottom: .3rem;
+    }
+    .pillar p { font-size: .88rem; color: oklch(74% 0.03 60); line-height: 1.6; }
+
+    /* ── FEATURES ─────────────────────────────── */
+    .features-inner { max-width: 1200px; margin: 0 auto; }
+    .features-header { margin-bottom: 3.5rem; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      background: var(--border);
+      border: 1.5px solid var(--border);
+    }
+    .feature-card {
+      background: var(--bg);
+      padding: 2.8rem 2.5rem;
+      transition: background .25s;
+    }
+    .feature-card:hover { background: var(--surface); }
+    .feature-icon {
+      width: 2.8rem;
+      height: 2.8rem;
+      background: color-mix(in oklch, var(--yellow) 22%, var(--bg));
+      border-radius: .45rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1.4rem;
+    }
+    .feature-card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      color: var(--orange-dark);
+      margin-bottom: .5rem;
+    }
+    .feature-card p { font-size: .875rem; color: var(--text-mid); line-height: 1.65; }
+
+    /* ── COMPARISON ───────────────────────────── */
+    .comparison { background: var(--surface); }
+    .comparison-inner { max-width: 1100px; margin: 0 auto; }
+    .comparison-header { margin-bottom: 3rem; }
+    .comparison-header .section-subtitle { margin-top: .8rem; }
+    .table-block { margin-bottom: 2.5rem; }
+    .table-block-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      margin-bottom: 1rem;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1.5px solid var(--border);
+      border-radius: .5rem;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    thead tr { background: var(--orange-dark); }
+    thead th {
+      padding: 1.1rem 1.4rem;
+      text-align: left;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: oklch(82% 0.04 68);
+      border-right: 1px solid oklch(36% 0.14 42);
+      white-space: nowrap;
+    }
+    thead th.hi { background: var(--yellow); color: var(--orange-dark); }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: color-mix(in oklch, var(--yellow) 6%, var(--bg)); }
+    tbody td {
+      padding: .9rem 1.4rem;
+      border-right: 1px solid var(--border);
+      color: var(--text-mid);
+      vertical-align: middle;
+    }
+    tbody td:first-child { font-weight: 600; color: var(--text); font-size: .85rem; }
+    tbody td.hi {
+      background: color-mix(in oklch, var(--yellow) 14%, var(--bg));
+      font-weight: 700;
+      color: var(--orange-dark);
+    }
+    .yes  { color: oklch(40% 0.12 145); font-size: 1rem; }
+    .part { color: var(--orange); font-size: .85rem; }
+    .no   { color: oklch(62% 0.04 50); font-size: 1rem; }
+
+    /* ── MATCH SECTION ────────────────────────── */
+    .match { background: var(--bg); overflow: hidden; }
+    .match-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 6rem;
+      align-items: center;
+    }
+    .match-visual { position: relative; height: 420px; }
+    .m-card {
+      position: absolute;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.1rem 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+      box-shadow: 0 6px 24px oklch(20% 0.08 45 / .08);
+      width: 270px;
+      animation-duration: 6s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+    }
+    .m-card:nth-child(1) { top: 0; left: 0; animation-name: floatA; }
+    .m-card:nth-child(2) { top: 32%; right: 0; animation-name: floatB; animation-delay: -.5s; }
+    .m-card:nth-child(3) { bottom: 0; left: 8%; animation-name: floatA; animation-delay: -1.2s; }
+    @keyframes floatA {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    @keyframes floatB {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(8px); }
+    }
+    .m-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--surface);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+    }
+    .m-info h4 { font-weight: 700; font-size: .875rem; color: var(--text); margin-bottom: .1rem; }
+    .m-info p  { font-size: .72rem; color: var(--text-light); }
+    .m-badge {
+      margin-left: auto;
+      background: var(--orange);
+      color: var(--bg);
+      font-size: .65rem;
+      font-weight: 700;
+      padding: .22rem .55rem;
+      border-radius: 2rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .m-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 72px; height: 72px;
+      background: color-mix(in oklch, var(--yellow) 25%, var(--bg));
+      border: 2px solid var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      z-index: 10;
+      animation: floatB 4s ease-in-out infinite;
+    }
+
+    /* ── CONTACT ──────────────────────────────── */
+    .contact { background: var(--orange-dark); }
+    .contact-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 6rem;
+      align-items: start;
+    }
+    .contact .section-label { color: var(--yellow); }
+    .contact .section-label::before { background: var(--yellow); }
+    .contact .section-title { color: var(--bg); }
+    .contact-desc { color: oklch(78% 0.03 62); font-size: .98rem; line-height: 1.7; margin-top: 1rem; }
+    .contact-details { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .c-item {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      color: oklch(74% 0.03 62);
+      font-size: .875rem;
+    }
+    .c-item .ci { color: var(--yellow); font-size: 1rem; flex-shrink: 0; }
+
+    form { display: flex; flex-direction: column; gap: 1.1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: .35rem; }
+    label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: oklch(70% 0.04 58);
+    }
+    input, textarea, select {
+      background: oklch(33% 0.14 42);
+      border: 1.5px solid oklch(40% 0.14 42);
+      color: var(--bg);
+      padding: .85rem 1.1rem;
+      border-radius: .4rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s;
+      appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: oklch(55% 0.08 52); }
+    input:focus, textarea:focus, select:focus { border-color: var(--yellow); }
+    select { cursor: pointer; }
+    select option { background: oklch(29% 0.16 42); }
+    textarea { resize: vertical; min-height: 110px; }
+    .btn-submit {
+      background: var(--yellow);
+      color: var(--orange-dark);
+      padding: .9rem 2.4rem;
+      border-radius: 3rem;
+      font-weight: 700;
+      font-size: .93rem;
+      border: none;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .03em;
+      align-self: flex-start;
+      transition: background .25s, transform .2s;
+    }
+    .btn-submit:hover { background: var(--bg); transform: translateY(-2px); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .form-success {
+      display: none;
+      color: var(--yellow);
+      font-size: .88rem;
+      font-weight: 600;
+      padding: .7rem 1rem;
+      background: color-mix(in oklch, var(--yellow) 15%, transparent);
+      border-radius: .4rem;
+    }
+
+    /* ── FOOTER ───────────────────────────────── */
+    footer {
+      background: oklch(13% 0.1 42);
+      color: oklch(55% 0.06 52);
+      padding: 2.5rem clamp(1.5rem, 5vw, 4rem);
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    }
+    .footer-logo img {
+      height: 36px;
+      width: auto;
+      opacity: .85;
+      filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(10deg) brightness(.9);
+    }
+    .footer-links { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; }
+    .footer-links a { color: oklch(55% 0.06 52); text-decoration: none; font-size: .83rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--yellow); }
+    .footer-copy { font-size: .78rem; }
+
+    /* ── SCROLL REVEAL ────────────────────────── */
+    .r { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+    .r.v { opacity: 1; transform: translateY(0); }
+    .d1 { transition-delay: .1s; }
+    .d2 { transition-delay: .2s; }
+    .d3 { transition-delay: .3s; }
+    .d4 { transition-delay: .4s; }
+
+    /* ── RESPONSIVE ───────────────────────────── */
+    @media (max-width: 900px) {
+      .about-inner, .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .match-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .match-visual { display: none; }
+      .hero-inner { flex-direction: column; align-items: flex-start; }
+      .hero-content { width: 100%; }
+      .hero-visual { order: -1; }
+      .hero-logo-wrap {
+        width: clamp(190px, 46vw, 300px);
+        height: clamp(190px, 46vw, 300px);
+      }
+      .hero-logo-img { width: clamp(165px, 40vw, 260px); }
+    }
+    @media (max-width: 640px) {
+      nav .nav-links { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.8rem; }
+      .hero-visual { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────────── -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <img src="/lauver-logo.png" alt="Lauver.ai">
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about" data-i18n="nav.about">About</a></li>
+    <li><a href="#features" data-i18n="nav.features">Features</a></li>
+    <li><a href="#compare" data-i18n="nav.compare">Compare</a></li>
+    <li><button class="lang-toggle-btn" style="background:transparent;border:1.5px solid var(--border);color:var(--text-mid);padding:.45rem .9rem;border-radius:2rem;font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s;letter-spacing:.04em">中文</button></li>
+    <li><a href="/login.html" class="nav-cta" data-i18n="nav.signin">Sign In</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────── -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="tag-pill r" data-i18n="hero.pill">AI-Powered Athletic Community · Now in Beta</div>
+      <h1 class="hero-headline r d1" data-i18n-html="hero.h1">
+        Find<br>Your<br><span class="accent">Pack.</span>
+      </h1>
+      <p class="hero-sub r d2" data-i18n="hero.sub">
+        Track every stride, climb, and sprint. Then let AI do what no fitness app has done before — find the athletes, partners, and communities that actually fit your life.
+      </p>
+      <div class="hero-actions r d3">
+        <a href="/login.html" class="btn-primary" data-i18n="hero.cta1">Get Early Access →</a>
+        <a href="/app.html" class="btn-ghost" data-i18n="hero.cta2">Try the App →</a>
+      </div>
+      <div class="sport-tags r d4">
+        <span class="sport-tag" data-i18n="hero.tag.run">🏃 Running</span>
+        <span class="sport-tag" data-i18n="hero.tag.cycle">🚴 Cycling</span>
+        <span class="sport-tag" data-i18n="hero.tag.swim">🏊 Swimming</span>
+        <span class="sport-tag" data-i18n="hero.tag.climb">🧗 Climbing</span>
+        <span class="sport-tag" data-i18n="hero.tag.hike">🥾 Hiking</span>
+        <span class="sport-tag" data-i18n="hero.tag.ski">⛷️ Skiing</span>
+        <span class="sport-tag" data-i18n="hero.tag.gym">🏋️ Gym</span>
+        <span class="sport-tag" data-i18n="hero.tag.yoga">🧘 Yoga</span>
+        <span class="sport-tag-more" data-i18n="hero.tag.more">+42 more →</span>
+      </div>
+    </div>
+    <div class="hero-visual r d1">
+      <div class="hero-logo-wrap">
+        <img src="/lauver-logo.png" alt="Lauver.ai" class="hero-logo-img">
+      </div>
+      <div class="h-bubble h-bubble-1">
+        <span class="bubble-icon">🧭</span>
+        <div>
+          <div class="bubble-val" data-i18n="hero.b1.val">Multi-Sport Ready</div>
+          <div class="bubble-label" data-i18n="hero.b1.lbl">Runs, rides, climbs, swims, and more</div>
+        </div>
+      </div>
+      <div class="h-bubble h-bubble-2">
+        <span class="bubble-icon">🤝</span>
+        <div>
+          <div class="bubble-val" data-i18n="hero.b2.val">Community First</div>
+          <div class="bubble-label" data-i18n="hero.b2.lbl">Find training partners and local groups</div>
+        </div>
+      </div>
+      <div class="h-bubble h-bubble-3">
+        <span class="bubble-icon">🔐</span>
+        <div>
+          <div class="bubble-val" data-i18n="hero.b3.val">Privacy Controlled</div>
+          <div class="bubble-label" data-i18n="hero.b3.lbl">You choose what to share and with whom</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats r d4">
+    <div>
+      <div class="stat-num" data-i18n="hero.s1.num">Real Workouts</div>
+      <div class="stat-label" data-i18n="hero.s1.lbl">Track sessions across every sport you do</div>
+    </div>
+    <div>
+      <div class="stat-num" data-i18n="hero.s2.num">Smart Matching</div>
+      <div class="stat-label" data-i18n="hero.s2.lbl">Connections based on goals, schedule, and style</div>
+    </div>
+    <div>
+      <div class="stat-num" data-i18n="hero.s3.num">Beta Access</div>
+      <div class="stat-label" data-i18n="hero.s3.lbl">Early members shape the product with feedback</div>
+    </div>
+    <div>
+      <div class="stat-num" data-i18n="hero.s4.num">Built Together</div>
+      <div class="stat-label" data-i18n="hero.s4.lbl">Designed for people who train better in a pack</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ──────────────────────────────────────────── -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="r">
+      <div class="section-label" data-i18n="about.label">About Lauver.ai</div>
+      <h2 class="section-title" data-i18n-html="about.title">Fitness Is<br>Better Together.</h2>
+      <div class="about-body">
+        <p data-i18n="about.p1">Lauver.ai was built on one truth every serious athlete knows: the best sessions happen when you have someone beside you. But finding that person — or that community — has always been harder than it should be.</p>
+        <p data-i18n="about.p2">We took the activity tracking depth you already rely on and layered it with something new: AI that actually understands who you are as an athlete, then builds the connections around that.</p>
+        <p data-i18n="about.p3">Whether you're a solo trail runner hunting for a weekend crew, a city cyclist chasing group rides, a beginner who needs accountability, or an outdoor obsessive who wants to explore with people who get it — Lauver finds your people.</p>
+      </div>
+    </div>
+    <div class="pillars r d1">
+      <div class="pillar">
+        <span class="pillar-num">01</span>
+        <div>
+          <h3 data-i18n="about.01.h">Track Everything</h3>
+          <p data-i18n="about.01.p">Log runs, rides, climbs, swims, and 50+ sports. GPS routes, performance stats, personal bests — all in one place, beautifully.</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <span class="pillar-num">02</span>
+        <div>
+          <h3 data-i18n="about.02.h">Match Your People</h3>
+          <p data-i18n="about.02.p">AI-powered partner matching based on sport, location, schedule, pace, and vibe. Not random suggestions — people who genuinely fit.</p>
+        </div>
+      </div>
+      <div class="pillar">
+        <span class="pillar-num">03</span>
+        <div>
+          <h3 data-i18n="about.03.h">Belong to Something</h3>
+          <p data-i18n="about.03.p">Discover local clubs, virtual groups, and event communities. Join organized group workouts. Build bonds that outlast any single activity.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────────────── -->
+<section id="features">
+  <div class="features-inner">
+    <div class="features-header r">
+      <div class="section-label" data-i18n="feat.label">How It Works</div>
+      <h2 class="section-title" data-i18n-html="feat.title">Three Steps to<br>Your Athletic Life.</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card r">
+        <div class="feature-icon">📍</div>
+        <h3 data-i18n="feat.1.h">Record Activities</h3>
+        <p data-i18n="feat.1.p">Track runs, rides, hikes, swims, and 50+ sports with GPS precision. Auto-detection, route mapping, and performance analysis all built in.</p>
+      </div>
+      <div class="feature-card r d1">
+        <div class="feature-icon">🤖</div>
+        <h3 data-i18n="feat.2.h">AI Matching Engine</h3>
+        <p data-i18n="feat.2.p">Analyzes pace, schedule, location, sport mix, and personality signals to surface athletes you'd genuinely want to train beside. Smart, not random.</p>
+      </div>
+      <div class="feature-card r d2">
+        <div class="feature-icon">🌿</div>
+        <h3 data-i18n="feat.3.h">Community Discovery</h3>
+        <p data-i18n="feat.3.p">Local groups and virtual clubs organized by sport, skill level, and energy. RSVP to organized sessions or start your own crew from scratch.</p>
+      </div>
+      <div class="feature-card r d1">
+        <div class="feature-icon">📊</div>
+        <h3 data-i18n="feat.4.h">Performance Intelligence</h3>
+        <p data-i18n="feat.4.p">AI coach insights on training load, recovery, and progression. Know when to push harder and when to pull back — before your body forces the decision.</p>
+      </div>
+      <div class="feature-card r d2">
+        <div class="feature-icon">🗺️</div>
+        <h3 data-i18n="feat.5.h">Route Discovery</h3>
+        <p data-i18n="feat.5.p">Crowdsourced route recommendations from real athletes nearby. Find the best trails, tracks, and outdoor spots your city is hiding from you.</p>
+      </div>
+      <div class="feature-card r d3">
+        <div class="feature-icon">🏆</div>
+        <h3 data-i18n="feat.6.h">Challenges & Goals</h3>
+        <p data-i18n="feat.6.p">Join community challenges or set personal goals with accountability partners. Compete, motivate, and celebrate — across any distance or discipline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMPARISON ─────────────────────────────────────── -->
+<section class="comparison" id="compare">
+  <div class="comparison-inner">
+    <div class="comparison-header r">
+      <div class="section-label" data-i18n="cmp.label">Platform Comparison</div>
+      <h2 class="section-title" data-i18n-html="cmp.title">Why Lauver<br>Changes Everything.</h2>
+      <p class="section-subtitle" data-i18n="cmp.sub">See how we stack up against the platforms athletes have been making do with — until now.</p>
+    </div>
+
+    <div class="table-block r">
+      <div class="table-block-title" data-i18n="cmp.t1.title">Feature Comparison</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="hi">Lauver.ai</th>
+              <th>Strava</th>
+              <th>Nike Run Club</th>
+              <th>Meetup</th>
+            </tr>
+          </thead>
+          <tbody data-table="table-features">
+            <tr>
+              <td>GPS Activity Tracking</td>
+              <td class="hi"><span class="yes">✓</span> 50+ sports</td>
+              <td><span class="yes">✓</span> ~20 types</td>
+              <td><span class="part">~</span> Run-focused</td>
+              <td><span class="no">✗</span></td>
+            </tr>
+            <tr>
+              <td>AI Partner Matching</td>
+              <td class="hi"><span class="yes">✓</span> Smart AI</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="no">✗</span></td>
+              <td><span class="no">✗</span></td>
+            </tr>
+            <tr>
+              <td>Community Discovery</td>
+              <td class="hi"><span class="yes">✓</span> AI-curated</td>
+              <td><span class="part">~</span> Basic clubs</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="yes">✓</span> Manual only</td>
+            </tr>
+            <tr>
+              <td>Exercise Partner Finding</td>
+              <td class="hi"><span class="yes">✓</span> Core feature</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="no">✗</span></td>
+              <td><span class="part">~</span> Basic</td>
+            </tr>
+            <tr>
+              <td>Multi-Sport Social Feed</td>
+              <td class="hi"><span class="yes">✓</span> All disciplines</td>
+              <td><span class="part">~</span> Silo'd by sport</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="part">~</span> Event-only</td>
+            </tr>
+            <tr>
+              <td>AI Performance Coach</td>
+              <td class="hi"><span class="yes">✓</span> Built-in, free</td>
+              <td><span class="part">~</span> Paid tier only</td>
+              <td><span class="part">~</span> Very limited</td>
+              <td><span class="no">✗</span></td>
+            </tr>
+            <tr>
+              <td>Route Discovery</td>
+              <td class="hi"><span class="yes">✓</span> Smart + social</td>
+              <td><span class="yes">✓</span> Good</td>
+              <td><span class="part">~</span> Basic</td>
+              <td><span class="no">✗</span></td>
+            </tr>
+            <tr>
+              <td>Indoor + Outdoor</td>
+              <td class="hi"><span class="yes">✓</span> Both fully</td>
+              <td><span class="yes">✓</span> Both</td>
+              <td><span class="part">~</span> Mostly outdoor</td>
+              <td><span class="no">✗</span></td>
+            </tr>
+            <tr>
+              <td>Real-Time Group Coordination</td>
+              <td class="hi"><span class="yes">✓</span> Built-in</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="no">✗</span></td>
+              <td><span class="part">~</span> Via 3rd party</td>
+            </tr>
+            <tr>
+              <td>Cross-Sport Communities</td>
+              <td class="hi"><span class="yes">✓</span> All sports</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="no">✗</span></td>
+              <td><span class="yes">✓</span> If group exists</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="table-block r">
+      <div class="table-block-title" data-i18n="cmp.t2.title">Pricing & Value</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th class="hi">Lauver.ai</th>
+              <th>Strava</th>
+              <th>Nike Run Club</th>
+              <th>Meetup</th>
+            </tr>
+          </thead>
+          <tbody data-table="table-pricing">
+            <tr>
+              <td>Free Tier Includes</td>
+              <td class="hi">Tracking + matching + communities</td>
+              <td>Basic tracking only</td>
+              <td>Running only</td>
+              <td>Join groups (limited)</td>
+            </tr>
+            <tr>
+              <td>Premium Price / month</td>
+              <td class="hi">$7.99 (early access)</td>
+              <td>$11.99</td>
+              <td>Free (limited)</td>
+              <td>$9.99 organizer fee</td>
+            </tr>
+            <tr>
+              <td>AI Features in Free</td>
+              <td class="hi"><span class="yes">✓</span> Yes</td>
+              <td><span class="no">✗</span> No</td>
+              <td><span class="no">✗</span> No</td>
+              <td><span class="no">✗</span> No</td>
+            </tr>
+            <tr>
+              <td>Community Features in Free</td>
+              <td class="hi"><span class="yes">✓</span> Full access</td>
+              <td><span class="no">✗</span> Locked</td>
+              <td><span class="no">✗</span> N/A</td>
+              <td><span class="part">~</span> View only</td>
+            </tr>
+            <tr>
+              <td>Partner Matching in Free</td>
+              <td class="hi"><span class="yes">✓</span> Core feature</td>
+              <td><span class="no">✗</span> Doesn't exist</td>
+              <td><span class="no">✗</span> Doesn't exist</td>
+              <td><span class="no">✗</span> Doesn't exist</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="table-block r">
+      <div class="table-block-title" data-i18n="cmp.t3.title">Who Is It For?</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Athlete Type</th>
+              <th class="hi">Lauver.ai</th>
+              <th>Strava</th>
+              <th>Nike Run Club</th>
+              <th>Meetup</th>
+            </tr>
+          </thead>
+          <tbody data-table="table-whoisitfor">
+            <tr>
+              <td>Solo runner wanting community</td>
+              <td class="hi"><span class="yes">✓</span> Perfect fit</td>
+              <td><span class="part">~</span> Possible</td>
+              <td><span class="part">~</span> Limited</td>
+              <td><span class="part">~</span> Possible</td>
+            </tr>
+            <tr>
+              <td>Multi-sport athlete</td>
+              <td class="hi"><span class="yes">✓</span> Perfect fit</td>
+              <td><span class="yes">✓</span> Good</td>
+              <td><span class="no">✗</span> Run only</td>
+              <td><span class="no">✗</span></td>
+            </tr>
+            <tr>
+              <td>Beginner seeking accountability</td>
+              <td class="hi"><span class="yes">✓</span> AI matches mentors</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="part">~</span> Guided runs only</td>
+              <td><span class="part">~</span> Manual search</td>
+            </tr>
+            <tr>
+              <td>Club / team organizer</td>
+              <td class="hi"><span class="yes">✓</span> Built-in tools</td>
+              <td><span class="part">~</span> Basic</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="yes">✓</span> Good</td>
+            </tr>
+            <tr>
+              <td>Outdoor / adventure athlete</td>
+              <td class="hi"><span class="yes">✓</span> Perfect fit</td>
+              <td><span class="part">~</span> Partial</td>
+              <td><span class="no">✗</span></td>
+              <td><span class="part">~</span> Via groups</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MATCH SECTION ──────────────────────────────────── -->
+<section class="match">
+  <div class="match-inner">
+    <div class="match-visual r">
+      <div class="m-card">
+        <div class="m-avatar">🏃‍♀️</div>
+        <div class="m-info">
+          <h4 data-i18n="match.sarah.name">Sarah K.</h4>
+          <p data-i18n="match.sarah.sub">Trail runner · 5:30/mi · NYC</p>
+        </div>
+        <span class="m-badge">96% match</span>
+      </div>
+      <div class="m-center">⚡</div>
+      <div class="m-card">
+        <div class="m-avatar">🚴‍♂️</div>
+        <div class="m-info">
+          <h4 data-i18n="match.marcus.name">Marcus T.</h4>
+          <p data-i18n="match.marcus.sub">Cyclist + hiker · Weekend warrior</p>
+        </div>
+        <span class="m-badge">88% match</span>
+      </div>
+      <div class="m-card">
+        <div class="m-avatar">🌲</div>
+        <div class="m-info">
+          <h4 data-i18n="match.crew.name">Central Park Crew</h4>
+          <p data-i18n="match.crew.sub">24 members · Tue + Sat mornings</p>
+        </div>
+        <span class="m-badge">Community</span>
+      </div>
+    </div>
+    <div class="r d1">
+      <div class="section-label" data-i18n="match.label">AI-Powered Matching</div>
+      <h2 class="section-title" data-i18n-html="match.title">Not Random.<br>Not Manual.<br>Actually Right.</h2>
+      <p class="section-subtitle" style="margin-top: 1rem;">
+        <span data-i18n-html="match.sub">Our matching engine considers pace compatibility, schedule alignment, sport overlap, location proximity, and training goals — then surfaces the people and communities most likely to stick.
+        <br><br>
+        No swiping through noise. No cold-emailing strangers. Just the right people showing up when you need them.</span>
+      </p>
+      <a href="#contact" class="btn-primary" style="margin-top: 2.5rem; display: inline-flex;" data-i18n="match.cta">Get Early Access →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ────────────────────────────────────────── -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="r">
+      <div class="section-label" data-i18n="contact.label">Get In Touch</div>
+      <h2 class="section-title" data-i18n-html="contact.title">Join the<br>Movement.</h2>
+      <p class="contact-desc" data-i18n="contact.desc">We're building something athletes have needed for a long time. If you want early access, want to partner, or just want to say hi — we read every message.</p>
+      <div class="contact-details">
+        <div class="c-item"><span class="ci">✉</span> hello@lauver.ai</div>
+        <div class="c-item"><span class="ci">📍</span> <span data-i18n="contact.loc">San Francisco, CA (and wherever you run)</span></div>
+        <div class="c-item"><span class="ci">◎</span> <span data-i18n="contact.social">@lauver.ai on all platforms</span></div>
+      </div>
+    </div>
+    <form class="r d1" id="contact-form" onsubmit="handleSubmit(event)" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname" data-i18n="contact.name.lbl">Name</label>
+          <input type="text" id="fname" name="name" placeholder="Your name" data-i18n-ph="contact.name.ph" required>
+        </div>
+        <div class="form-group">
+          <label for="femail" data-i18n="contact.email.lbl">Email</label>
+          <input type="email" id="femail" name="email" placeholder="your@email.com" data-i18n-ph="contact.email.ph" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="frole" data-i18n="contact.role.lbl">I'm a…</label>
+        <select id="frole" name="role">
+          <option value="" disabled selected data-i18n="contact.role.ph">Select your role</option>
+          <option data-i18n="contact.role.o1">Athlete looking for early access</option>
+          <option data-i18n="contact.role.o2">Running / cycling club organizer</option>
+          <option data-i18n="contact.role.o3">Brand or partnership inquiry</option>
+          <option data-i18n="contact.role.o4">Press / media</option>
+          <option data-i18n="contact.role.o5">Investor</option>
+          <option data-i18n="contact.role.o6">Just curious</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fmsg" data-i18n="contact.msg.lbl">Message</label>
+        <textarea id="fmsg" name="message" placeholder="Tell us about your sport, your goals, or what you'd love to see in Lauver..." data-i18n-ph="contact.msg.ph" required></textarea>
+      </div>
+      <button type="submit" class="btn-submit" id="submit-btn" data-i18n="contact.btn">Send It →</button>
+      <div class="form-success" id="form-success" data-i18n="contact.success">✓ Message sent! We'll be in touch soon.</div>
+    </form>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="/lauver-logo.png" alt="Lauver.ai">
+    </div>
+    <ul class="footer-links">
+      <li><a href="#about" data-i18n="footer.about">About</a></li>
+      <li><a href="#features" data-i18n="footer.features">Features</a></li>
+      <li><a href="#compare" data-i18n="footer.compare">Compare</a></li>
+      <li><a href="#contact" data-i18n="footer.contact">Contact</a></li>
+    </ul>
+    <p class="footer-copy" data-i18n="footer.copy">© 2025 Lauver.ai — Built for athletes who move together.</p>
+  </div>
+</footer>
+
+<script type="module">
+  import { initI18n } from '/src/i18n.js';
+  initI18n();
+</script>
+<script>
+  const revealEls = document.querySelectorAll('.r');
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('v'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -36px 0px' });
+  revealEls.forEach(el => revealObs.observe(el));
+
+  setTimeout(() => {
+    document.querySelectorAll('.hero .r').forEach(el => el.classList.add('v'));
+  }, 120);
+
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 70);
+  }, { passive: true });
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    setTimeout(() => {
+      e.target.reset();
+      btn.style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    }, 1100);
+  }
+</script>
+</body>
+</html>

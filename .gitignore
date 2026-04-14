@@ -1,0 +1,17 @@
+# Firebase service account — NEVER commit this
+*firebase-adminsdk*.json
+*.json.key
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# OS
+.DS_Store

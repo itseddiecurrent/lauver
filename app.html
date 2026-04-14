@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App — Lauver.ai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          oklch(99% 0.007 75);
+      --surface:     oklch(96% 0.015 72);
+      --border:      oklch(90% 0.022 70);
+      --orange:      oklch(63% 0.22 43);
+      --orange-dark: oklch(29% 0.16 42);
+      --yellow:      oklch(80% 0.19 80);
+      --text:        oklch(16% 0.04 45);
+      --text-mid:    oklch(40% 0.06 48);
+      --text-light:  oklch(62% 0.04 50);
+      --green:       oklch(60% 0.18 145);
+      --red:         oklch(58% 0.22 25);
+      --sidebar-w:   240px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ───────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--orange-dark);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      overflow: hidden;
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .sidebar-logo {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid color-mix(in oklch, var(--yellow) 12%, transparent);
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .sidebar-logo img { height: 36px; width: auto; }
+    .sidebar-logo-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      color: var(--bg);
+      letter-spacing: .05em;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+      overflow-y: auto;
+    }
+    .nav-section-label {
+      font-size: .63rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: oklch(55% 0.04 55);
+      padding: .8rem 1.5rem .3rem;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .65rem 1.5rem;
+      color: oklch(70% 0.04 62);
+      cursor: pointer;
+      font-size: .88rem;
+      font-weight: 600;
+      border-radius: 0;
+      transition: background .15s, color .15s;
+      position: relative;
+      user-select: none;
+    }
+    .nav-item:hover {
+      background: color-mix(in oklch, var(--yellow) 8%, transparent);
+      color: oklch(88% 0.05 68);
+    }
+    .nav-item.active {
+      background: color-mix(in oklch, var(--yellow) 14%, transparent);
+      color: var(--yellow);
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--yellow);
+      border-radius: 0 2px 2px 0;
+    }
+    .nav-icon {
+      width: 20px; height: 20px;
+      flex-shrink: 0;
+      opacity: .75;
+    }
+    .nav-item.active .nav-icon { opacity: 1; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--orange);
+      color: var(--bg);
+      font-size: .62rem;
+      font-weight: 700;
+      padding: .1rem .45rem;
+      border-radius: 2rem;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid color-mix(in oklch, var(--yellow) 12%, transparent);
+    }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .sidebar-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: color-mix(in oklch, var(--yellow) 18%, transparent);
+      border: 1.5px solid color-mix(in oklch, var(--yellow) 30%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: .9rem;
+      color: var(--yellow);
+      flex-shrink: 0;
+    }
+    .sidebar-user-info { flex: 1; min-width: 0; }
+    .sidebar-user-name {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--bg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-user-status {
+      font-size: .68rem;
+      color: oklch(60% 0.04 58);
+    }
+
+    /* ── MOBILE TOPBAR ─────────────────────────── */
+    .topbar {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: var(--orange-dark);
+      align-items: center;
+      padding: 0 1rem;
+      gap: 1rem;
+      z-index: 200;
+    }
+    .topbar-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .4rem;
+      color: var(--bg);
+    }
+    .topbar-logo { height: 28px; width: auto; }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: oklch(10% 0.03 45 / .4);
+      z-index: 90;
+    }
+
+    /* ── MAIN CONTENT ──────────────────────────── */
+    .app-main {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOPBAR (desktop) ──────────────────────── */
+    .app-topbar {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      letter-spacing: .04em;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .topbar-btn {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-mid);
+      padding: .4rem 1rem;
+      border-radius: 2rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      text-decoration: none;
+    }
+    .topbar-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .topbar-btn.primary {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: var(--bg);
+    }
+    .topbar-btn.primary:hover { background: var(--orange-dark); border-color: var(--orange-dark); }
+
+    /* ── PAGE ──────────────────────────────────── */
+    .page {
+      display: none;
+      flex: 1;
+      padding: 2rem;
+    }
+    .page.active { display: block; }
+
+    /* ── STAT CARDS ────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .9rem;
+      padding: 1.2rem 1.4rem;
+    }
+    .stat-label {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: .4rem;
+    }
+    .stat-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 2.1rem;
+      color: var(--orange-dark);
+      line-height: 1;
+    }
+    .stat-sub {
+      font-size: .75rem;
+      color: var(--text-light);
+      margin-top: .25rem;
+    }
+    .stat-delta {
+      font-size: .72rem;
+      font-weight: 700;
+      margin-top: .3rem;
+    }
+    .stat-delta.up { color: var(--green); }
+    .stat-delta.down { color: var(--red); }
+
+    /* ── SECTION HEAD ──────────────────────────── */
+    .section-head {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      letter-spacing: .04em;
+      margin-bottom: 1rem;
+    }
+
+    /* ── TWO COL ───────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ── ACTIVITY LIST ─────────────────────────── */
+    .activity-list { display: flex; flex-direction: column; gap: .6rem; }
+    .activity-item {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .8rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+    .activity-item:hover { border-color: color-mix(in oklch, var(--orange) 40%, transparent); }
+    .activity-sport-icon {
+      width: 42px; height: 42px;
+      border-radius: .6rem;
+      background: color-mix(in oklch, var(--orange) 10%, var(--bg));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .activity-details { flex: 1; min-width: 0; }
+    .activity-name {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: .15rem;
+    }
+    .activity-meta {
+      font-size: .75rem;
+      color: var(--text-light);
+    }
+    .activity-stats {
+      display: flex;
+      gap: 1.2rem;
+      text-align: right;
+    }
+    .act-stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--orange-dark);
+    }
+    .act-stat-lbl {
+      font-size: .65rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    /* ── CHART PLACEHOLDER ─────────────────────── */
+    .chart-placeholder {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .9rem;
+      padding: 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: .4rem;
+      height: 100px;
+      padding-top: .5rem;
+    }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .4rem; }
+    .chart-bar {
+      width: 100%;
+      background: color-mix(in oklch, var(--orange) 20%, var(--bg));
+      border-radius: .3rem .3rem 0 0;
+      transition: background .2s;
+    }
+    .chart-bar.active { background: var(--orange); }
+    .chart-bar-label { font-size: .65rem; color: var(--text-light); }
+
+    /* ── MINI STAT CARD ────────────────────────── */
+    .mini-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .8rem;
+      padding: 1rem 1.2rem;
+      margin-bottom: .75rem;
+    }
+    .mini-card:last-child { margin-bottom: 0; }
+    .mini-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .6rem;
+    }
+
+    /* ── SYNC PAGE ─────────────────────────────── */
+    .sync-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .sync-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.6rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .75rem;
+    }
+    .sync-card.connected {
+      border-color: color-mix(in oklch, var(--green) 35%, transparent);
+      background: color-mix(in oklch, var(--green) 5%, var(--bg));
+    }
+    .sync-logo {
+      width: 44px; height: 44px;
+      border-radius: .6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .sync-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      letter-spacing: .03em;
+    }
+    .sync-desc {
+      font-size: .78rem;
+      color: var(--text-mid);
+      line-height: 1.5;
+      flex: 1;
+    }
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .sync-status.connected { color: var(--green); }
+    .sync-status.disconnected { color: var(--text-light); }
+    .sync-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .btn-sync {
+      width: 100%;
+      padding: .55rem;
+      border-radius: .45rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .btn-sync.connect {
+      background: var(--orange);
+      border: 1.5px solid var(--orange);
+      color: var(--bg);
+    }
+    .btn-sync.connect:hover { background: var(--orange-dark); border-color: var(--orange-dark); }
+    .btn-sync.disconnect {
+      background: transparent;
+      border: 1.5px solid color-mix(in oklch, var(--green) 50%, transparent);
+      color: var(--green);
+    }
+    .btn-sync.disconnect:hover {
+      background: color-mix(in oklch, var(--red) 8%, transparent);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* ── COMMUNITY ─────────────────────────────── */
+    .community-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .compose-box {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .9rem;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.2rem;
+    }
+    .compose-row {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+    }
+    .compose-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      color: var(--bg);
+      font-size: .95rem;
+      flex-shrink: 0;
+    }
+    .compose-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 2rem;
+      padding: .6rem 1.1rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .85rem;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+    .compose-input:hover { border-color: color-mix(in oklch, var(--orange) 40%, transparent); }
+    .compose-actions {
+      display: flex;
+      gap: .5rem;
+      margin-top: .9rem;
+      padding-top: .9rem;
+      border-top: 1px solid var(--border);
+    }
+    .compose-action-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: .45rem;
+      border-radius: .4rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      transition: background .15s, color .15s;
+    }
+    .compose-action-btn:hover { background: var(--border); color: var(--text); }
+
+    .post-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .9rem;
+      padding: 1.3rem 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      margin-bottom: .9rem;
+    }
+    .post-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: .9rem;
+      color: var(--bg);
+      flex-shrink: 0;
+    }
+    .post-author { flex: 1; }
+    .post-author-name {
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .post-time {
+      font-size: .72rem;
+      color: var(--text-light);
+    }
+    .post-more {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: 1.1rem;
+      padding: .2rem;
+    }
+    .post-body {
+      font-size: .88rem;
+      line-height: 1.6;
+      color: var(--text);
+      margin-bottom: .9rem;
+    }
+    .post-activity {
+      background: color-mix(in oklch, var(--orange) 8%, var(--bg));
+      border: 1px solid color-mix(in oklch, var(--orange) 20%, transparent);
+      border-radius: .6rem;
+      padding: .7rem .9rem;
+      margin-bottom: .9rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .post-activity-icon { font-size: 1.4rem; }
+    .post-activity-details { flex: 1; }
+    .post-activity-name {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--orange-dark);
+    }
+    .post-activity-stats {
+      font-size: .72rem;
+      color: var(--text-mid);
+    }
+    .post-reactions {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .75rem;
+    }
+    .reaction-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      background: color-mix(in oklch, var(--orange) 10%, var(--bg));
+      border: 1px solid color-mix(in oklch, var(--orange) 20%, transparent);
+      border-radius: 2rem;
+      padding: .2rem .6rem;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--orange-dark);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .reaction-pill:hover { background: color-mix(in oklch, var(--orange) 16%, var(--bg)); }
+    .post-actions {
+      display: flex;
+      gap: .4rem;
+      padding-top: .75rem;
+      border-top: 1px solid var(--border);
+    }
+    .post-action {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: .4rem;
+      border-radius: .4rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      transition: background .15s, color .15s;
+    }
+    .post-action:hover { background: var(--border); color: var(--text); }
+
+    /* Community sidebar */
+    .community-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .sidebar-widget {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .9rem;
+      padding: 1.2rem 1.4rem;
+    }
+    .widget-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: .95rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      letter-spacing: .04em;
+      margin-bottom: .9rem;
+    }
+    .group-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .5rem 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .group-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .group-icon {
+      width: 36px; height: 36px;
+      border-radius: .5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      background: color-mix(in oklch, var(--orange) 10%, var(--bg));
+      flex-shrink: 0;
+    }
+    .group-name { font-size: .83rem; font-weight: 600; color: var(--text); }
+    .group-members { font-size: .7rem; color: var(--text-light); }
+    .btn-join {
+      margin-left: auto;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-mid);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .22rem .65rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      white-space: nowrap;
+    }
+    .btn-join:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* ── MATCHING PAGE ─────────────────────────── */
+    .match-gate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+    }
+    .gate-icon { font-size: 3.5rem; margin-bottom: 1.2rem; }
+    .gate-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 2rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      margin-bottom: .5rem;
+      line-height: 1;
+    }
+    .gate-sub {
+      font-size: .9rem;
+      color: var(--text-mid);
+      max-width: 380px;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .progress-checklist {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .4rem 0;
+      font-size: .85rem;
+    }
+    .check-item.done { color: var(--green); }
+    .check-item.pending { color: var(--text-light); }
+    .check-circle {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      flex-shrink: 0;
+    }
+    .check-item.done .check-circle { background: var(--green); color: white; }
+    .check-item.pending .check-circle {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: transparent;
+    }
+    .btn-complete-profile {
+      background: var(--orange);
+      color: var(--bg);
+      border: none;
+      border-radius: .5rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .92rem;
+      font-weight: 700;
+      padding: .75rem 2rem;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .btn-complete-profile:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+    /* Tinder card stack */
+    .match-layout {
+      display: none;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .match-layout.visible { display: grid; }
+    .tinder-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card-stack-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      height: 480px;
+      margin: 0 auto 1.5rem;
+    }
+    .match-card {
+      position: absolute;
+      inset: 0;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 1.2rem;
+      overflow: hidden;
+      transition: transform .2s;
+    }
+    .match-card:nth-child(2) {
+      transform: scale(.97) translateY(8px);
+      z-index: 1;
+    }
+    .match-card:nth-child(3) {
+      transform: scale(.94) translateY(16px);
+      z-index: 0;
+    }
+    .match-card:first-child { z-index: 2; }
+    .match-card-photo {
+      width: 100%;
+      height: 310px;
+      object-fit: cover;
+      background: linear-gradient(160deg,
+        color-mix(in oklch, var(--orange) 15%, var(--bg)),
+        color-mix(in oklch, var(--yellow) 20%, var(--bg)));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+    }
+    .match-card-body { padding: 1.1rem 1.3rem; }
+    .match-card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      line-height: 1;
+      margin-bottom: .2rem;
+    }
+    .match-card-location {
+      font-size: .78rem;
+      color: var(--text-light);
+      margin-bottom: .6rem;
+    }
+    .match-sports { display: flex; flex-wrap: wrap; gap: .3rem; }
+    .sport-tag {
+      font-size: .68rem;
+      font-weight: 700;
+      padding: .15rem .55rem;
+      border-radius: 2rem;
+      background: color-mix(in oklch, var(--orange) 10%, var(--bg));
+      border: 1px solid color-mix(in oklch, var(--orange) 22%, transparent);
+      color: var(--orange-dark);
+    }
+    .swipe-buttons {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .swipe-btn {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      border: 2px solid;
+      background: transparent;
+      font-size: 1.6rem;
+      cursor: pointer;
+      transition: transform .15s, background .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .swipe-btn:hover { transform: scale(1.12); }
+    .swipe-btn.pass { border-color: var(--red); color: var(--red); }
+    .swipe-btn.pass:hover { background: color-mix(in oklch, var(--red) 10%, transparent); }
+    .swipe-btn.like { border-color: var(--green); color: var(--green); }
+    .swipe-btn.like:hover { background: color-mix(in oklch, var(--green) 10%, transparent); }
+    .swipe-btn.super { border-color: var(--orange); color: var(--orange); width: 52px; height: 52px; font-size: 1.3rem; }
+    .swipe-btn.super:hover { background: color-mix(in oklch, var(--orange) 10%, transparent); }
+
+    .match-filters {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .9rem;
+      padding: 1.4rem;
+    }
+    .filter-label {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: .5rem;
+      margin-top: .9rem;
+    }
+    .filter-label:first-child { margin-top: 0; }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .filter-chip {
+      padding: .25rem .7rem;
+      border-radius: 2rem;
+      font-size: .72rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-chip.active {
+      background: color-mix(in oklch, var(--orange) 12%, var(--bg));
+      border-color: color-mix(in oklch, var(--orange) 40%, transparent);
+      color: var(--orange-dark);
+    }
+    .range-slider {
+      width: 100%;
+      accent-color: var(--orange);
+      margin-top: .4rem;
+    }
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: .68rem;
+      color: var(--text-light);
+      margin-top: .2rem;
+    }
+
+    /* ── PROFILE PAGE ──────────────────────────── */
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .profile-sidebar-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 1rem;
+      overflow: hidden;
+      position: sticky;
+      top: 80px;
+    }
+    .profile-photo-area {
+      aspect-ratio: 1;
+      background: color-mix(in oklch, var(--orange) 10%, var(--bg));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .profile-photo-area:hover { background: color-mix(in oklch, var(--orange) 15%, var(--bg)); }
+    .upload-icon { font-size: 2.5rem; opacity: .5; }
+    .upload-text { font-size: .78rem; font-weight: 600; color: var(--text-mid); }
+    .profile-progress-wrap {
+      padding: 1.2rem;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .5rem;
+    }
+    .progress-label {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-light);
+    }
+    .progress-pct {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--orange);
+    }
+    .progress-bar-bg {
+      background: var(--border);
+      border-radius: 2rem;
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 2rem;
+      transition: width .4s ease;
+    }
+    .profile-checklist { margin-top: .8rem; display: flex; flex-direction: column; gap: .3rem; }
+    .profile-check {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .75rem;
+    }
+    .profile-check.done { color: var(--green); }
+    .profile-check.todo { color: var(--text-light); }
+    .profile-check-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+    .match-unlock-badge {
+      margin-top: 1rem;
+      background: color-mix(in oklch, var(--orange) 10%, var(--bg));
+      border: 1px solid color-mix(in oklch, var(--orange) 25%, transparent);
+      border-radius: .5rem;
+      padding: .65rem .9rem;
+      font-size: .75rem;
+      color: var(--orange-dark);
+      line-height: 1.5;
+    }
+
+    .profile-form { display: flex; flex-direction: column; gap: 1.2rem; }
+    .form-section {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: .9rem;
+      padding: 1.4rem;
+    }
+    .form-section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      letter-spacing: .04em;
+      margin-bottom: 1.1rem;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+    .form-field { display: flex; flex-direction: column; gap: .3rem; }
+    .form-field.full { grid-column: 1 / -1; }
+    .form-label {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+    }
+    .form-input {
+      padding: .65rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: .45rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .88rem;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input::placeholder { color: var(--text-light); }
+    .form-input:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--orange) 10%, transparent);
+    }
+    .form-select {
+      padding: .65rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: .45rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .88rem;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      cursor: pointer;
+    }
+    .sport-picker { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .sport-pick-btn {
+      padding: .3rem .8rem;
+      border-radius: 2rem;
+      font-size: .78rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .sport-pick-btn.selected {
+      background: color-mix(in oklch, var(--orange) 12%, var(--bg));
+      border-color: var(--orange);
+      color: var(--orange-dark);
+    }
+    .form-textarea {
+      padding: .65rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: .45rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .88rem;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      resize: vertical;
+      min-height: 80px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-textarea:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--orange) 10%, transparent);
+    }
+    .verify-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .verify-text h4 { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: .2rem; }
+    .verify-text p { font-size: .78rem; color: var(--text-mid); }
+    .btn-verify {
+      background: var(--orange);
+      color: var(--bg);
+      border: none;
+      border-radius: .45rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .82rem;
+      font-weight: 700;
+      padding: .55rem 1.3rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .2s;
+    }
+    .btn-verify:hover { background: var(--orange-dark); }
+    .btn-publish {
+      width: 100%;
+      padding: .9rem;
+      background: var(--orange-dark);
+      color: var(--bg);
+      border: none;
+      border-radius: .5rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      letter-spacing: .02em;
+    }
+    .btn-publish:hover { background: var(--orange); transform: translateY(-1px); }
+
+    /* ── RESPONSIVE ────────────────────────────── */
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+      .sync-grid { grid-template-columns: repeat(2, 1fr); }
+      .community-layout { grid-template-columns: 1fr; }
+      .match-layout { grid-template-columns: 1fr; }
+      .profile-layout { grid-template-columns: 1fr; }
+      .profile-sidebar-card { position: static; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .topbar { display: flex; }
+      .app-main { margin-left: 0; padding-top: 56px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .sync-grid { grid-template-columns: 1fr; }
+      .page { padding: 1.2rem; }
+      .app-topbar { padding: 0 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ───────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="/lauver-logo.png" alt="Lauver.ai">
+    <span class="sidebar-logo-text">Lauver.ai</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label" data-i18n="app.sec.main">Main</div>
+    <div class="nav-item active" data-page="dashboard">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <span data-i18n="app.nav.dashboard">Dashboard</span>
+    </div>
+    <div class="nav-item" data-page="activities">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      <span data-i18n="app.nav.activities">Activities</span>
+    </div>
+
+    <div class="nav-section-label" data-i18n="app.sec.sync">Sync</div>
+    <div class="nav-item" data-page="sync">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+      </svg>
+      <span data-i18n="app.nav.sync">Connect Apps</span>
+    </div>
+
+    <div class="nav-section-label" data-i18n="app.sec.community">Community</div>
+    <div class="nav-item" data-page="community">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span data-i18n="app.nav.community">Community</span>
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" data-page="match">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <span data-i18n="app.nav.match">Find Athletes</span>
+    </div>
+
+    <div class="nav-section-label" data-i18n="app.sec.account">Account</div>
+    <div class="nav-item" data-page="profile">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span data-i18n="app.nav.profile">My Profile</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">J</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Jane Smith</div>
+        <div class="sidebar-user-status" data-i18n="app.user.status">🔥 Early Access</div>
+      </div>
+    </div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- ── MOBILE TOPBAR ────────────────────────── -->
+<div class="topbar">
+  <button class="topbar-toggle" id="topbar-toggle">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <img src="/lauver-logo.png" alt="Lauver.ai" class="topbar-logo">
+</div>
+
+<!-- ── MAIN ──────────────────────────────────── -->
+<div class="app-main">
+
+  <!-- Desktop Topbar -->
+  <div class="app-topbar">
+    <span class="topbar-title" id="page-title">Dashboard</span>
+    <div class="topbar-actions">
+      <button class="lang-toggle-btn" style="background:transparent;border:1.5px solid var(--border);color:var(--text-mid);padding:.38rem .85rem;border-radius:2rem;font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s">中文</button>
+      <a href="/" class="topbar-btn" data-i18n="app.back">← Back to Home</a>
+      <button class="topbar-btn primary" onclick="navigate('activities')" data-i18n="app.log">+ Log Activity</button>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD PAGE ───────────────────── -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.dash.s1.lbl">This Week</div>
+        <div class="stat-value">3</div>
+        <div class="stat-sub" data-i18n="app.dash.s1.sub">activities</div>
+        <div class="stat-delta up" data-i18n="app.dash.s1.delta">↑ 1 from last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.dash.s2.lbl">Distance</div>
+        <div class="stat-value">42.1</div>
+        <div class="stat-sub" data-i18n="app.dash.s2.sub">km this week</div>
+        <div class="stat-delta up" data-i18n="app.dash.s2.delta">↑ 8.3 km</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.dash.s3.lbl">Active Time</div>
+        <div class="stat-value">3h24</div>
+        <div class="stat-sub" data-i18n="app.dash.s3.sub">this week</div>
+        <div class="stat-delta down" data-i18n="app.dash.s3.delta">↓ 12 min</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.dash.s4.lbl">Matches</div>
+        <div class="stat-value">—</div>
+        <div class="stat-sub" data-i18n="app.dash.s4.sub">complete profile to unlock</div>
+        <div class="stat-delta" style="color:var(--text-light)" data-i18n="app.dash.s4.delta">profile incomplete</div>
+      </div>
+    </div>
+
+    <!-- Weekly chart -->
+    <div class="chart-placeholder">
+      <div class="section-head" style="margin-bottom:.8rem" data-i18n="app.dash.chart">Weekly Activity</div>
+      <div class="chart-bars">
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:40px"></div>
+          <div class="chart-bar-label" data-i18n="app.chart.mon">Mon</div>
+        </div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:65px"></div>
+          <div class="chart-bar-label" data-i18n="app.chart.tue">Tue</div>
+        </div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:0px"></div>
+          <div class="chart-bar-label" data-i18n="app.chart.wed">Wed</div>
+        </div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:80px"></div>
+          <div class="chart-bar-label" data-i18n="app.chart.thu">Thu</div>
+        </div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar active" style="height:55px"></div>
+          <div class="chart-bar-label" data-i18n="app.chart.fri">Fri</div>
+        </div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:25px"></div>
+          <div class="chart-bar-label" data-i18n="app.chart.sat">Sat</div>
+        </div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar" style="height:0px"></div>
+          <div class="chart-bar-label" data-i18n="app.chart.sun">Sun</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="section-head" data-i18n="app.dash.recent">Recent Activities</div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-sport-icon">🏃</div>
+            <div class="activity-details">
+              <div class="activity-name" data-i18n="app.dash.a1.name">Morning Run — Riverside Trail</div>
+              <div class="activity-meta" data-i18n="app.dash.a1.meta">Today, 6:42 am · Running</div>
+            </div>
+            <div class="activity-stats">
+              <div><div class="act-stat-val">8.3</div><div class="act-stat-lbl">km</div></div>
+              <div><div class="act-stat-val">42:17</div><div class="act-stat-lbl">time</div></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-sport-icon">🚴</div>
+            <div class="activity-details">
+              <div class="activity-name" data-i18n="app.dash.a2.name">Evening Ride — City Loop</div>
+              <div class="activity-meta" data-i18n="app.dash.a2.meta">Yesterday · Cycling</div>
+            </div>
+            <div class="activity-stats">
+              <div><div class="act-stat-val">24.6</div><div class="act-stat-lbl">km</div></div>
+              <div><div class="act-stat-val">1:02:44</div><div class="act-stat-lbl">time</div></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-sport-icon">🧗</div>
+            <div class="activity-details">
+              <div class="activity-name" data-i18n="app.dash.a3.name">Bouldering Session — The Cave</div>
+              <div class="activity-meta" data-i18n="app.dash.a3.meta">2 days ago · Climbing</div>
+            </div>
+            <div class="activity-stats">
+              <div><div class="act-stat-val">14</div><div class="act-stat-lbl">routes</div></div>
+              <div><div class="act-stat-val">1:20:00</div><div class="act-stat-lbl">time</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-head" data-i18n="app.dash.quickstats">Quick Stats</div>
+        <div class="mini-card">
+          <div class="mini-card-head">
+            <span style="font-size:.8rem;font-weight:700;color:var(--text-mid)" data-i18n="app.dash.month">Month Total</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+            <div><div class="stat-value" style="font-size:1.5rem">11</div><div class="stat-sub">activities</div></div>
+            <div><div class="stat-value" style="font-size:1.5rem">168</div><div class="stat-sub">km</div></div>
+          </div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-head">
+            <span style="font-size:.8rem;font-weight:700;color:var(--text-mid)" data-i18n="app.dash.community">Community</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--text-mid);line-height:1.5">3 new posts from athletes near you.<br>
+            <a style="color:var(--orange);font-weight:700;cursor:pointer" onclick="navigate('community')" data-i18n="app.dash.comm.link">View feed →</a>
+          </div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-head">
+            <span style="font-size:.8rem;font-weight:700;color:var(--text-mid)" data-i18n="app.dash.profile.lbl">Profile</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--text-mid);line-height:1.5;margin-bottom:.6rem">40% complete — finish to unlock athlete matching.</div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:40%"></div></div>
+          <div style="margin-top:.6rem">
+            <a style="font-size:.78rem;color:var(--orange);font-weight:700;cursor:pointer" onclick="navigate('profile')" data-i18n="app.dash.prof.link">Complete profile →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ACTIVITIES PAGE ───────────────────── -->
+  <div class="page" id="page-activities">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.act.s1.lbl">Total Activities</div>
+        <div class="stat-value">47</div>
+        <div class="stat-sub" data-i18n="app.act.s1.sub">all time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.act.s2.lbl">Total Distance</div>
+        <div class="stat-value">612</div>
+        <div class="stat-sub" data-i18n="app.act.s2.sub">km all time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.act.s3.lbl">Longest Activity</div>
+        <div class="stat-value">38.4</div>
+        <div class="stat-sub" data-i18n="app.act.s3.sub">km — Half Marathon</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" data-i18n="app.act.s4.lbl">Best Pace</div>
+        <div class="stat-value">4:32</div>
+        <div class="stat-sub" data-i18n="app.act.s4.sub">min/km</div>
+      </div>
+    </div>
+
+    <div class="chart-placeholder" style="margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem">
+        <div class="section-head" style="margin-bottom:0" data-i18n="app.act.chart">Distance by Week</div>
+        <div style="display:flex;gap:.4rem">
+          <button class="filter-chip active">Month</button>
+          <button class="filter-chip">3 Months</button>
+          <button class="filter-chip">Year</button>
+        </div>
+      </div>
+      <div class="chart-bars" style="height:120px">
+        <div class="chart-bar-wrap"><div class="chart-bar" style="height:55px"></div><div class="chart-bar-label" data-i18n="app.act.chart.w1">W1</div></div>
+        <div class="chart-bar-wrap"><div class="chart-bar" style="height:80px"></div><div class="chart-bar-label" data-i18n="app.act.chart.w2">W2</div></div>
+        <div class="chart-bar-wrap"><div class="chart-bar" style="height:35px"></div><div class="chart-bar-label" data-i18n="app.act.chart.w3">W3</div></div>
+        <div class="chart-bar-wrap"><div class="chart-bar active" style="height:95px"></div><div class="chart-bar-label" data-i18n="app.act.chart.w4">W4</div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="section-head" style="margin-bottom:0" data-i18n="app.act.head">All Activities</div>
+      <div style="display:flex;gap:.4rem">
+        <button class="filter-chip active" data-i18n="app.act.f.all">All</button>
+        <button class="filter-chip">🏃 Run</button>
+        <button class="filter-chip">🚴 Ride</button>
+        <button class="filter-chip">🧗 Climb</button>
+        <button class="filter-chip">🏊 Swim</button>
+      </div>
+    </div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="activity-sport-icon">🏃</div>
+        <div class="activity-details">
+          <div class="activity-name" data-i18n="app.act.a1.name">Morning Run — Riverside Trail</div>
+          <div class="activity-meta" data-i18n="app.act.a1.meta">Today · Running · Avg pace 5:05/km · 312 kcal</div>
+        </div>
+        <div class="activity-stats">
+          <div><div class="act-stat-val">8.3 km</div><div class="act-stat-lbl" data-i18n="app.act.dist.lbl">distance</div></div>
+          <div><div class="act-stat-val">42:17</div><div class="act-stat-lbl" data-i18n="app.act.time.lbl">time</div></div>
+          <div><div class="act-stat-val">148</div><div class="act-stat-lbl" data-i18n="app.act.bpm.lbl">bpm avg</div></div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-sport-icon">🚴</div>
+        <div class="activity-details">
+          <div class="activity-name" data-i18n="app.act.a2.name">Evening Ride — City Loop</div>
+          <div class="activity-meta" data-i18n="app.act.a2.meta">Yesterday · Cycling · Avg 23.7 km/h · 480 kcal</div>
+        </div>
+        <div class="activity-stats">
+          <div><div class="act-stat-val">24.6 km</div><div class="act-stat-lbl" data-i18n="app.act.dist.lbl">distance</div></div>
+          <div><div class="act-stat-val">1:02:44</div><div class="act-stat-lbl" data-i18n="app.act.time.lbl">time</div></div>
+          <div><div class="act-stat-val">139</div><div class="act-stat-lbl" data-i18n="app.act.bpm.lbl">bpm avg</div></div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-sport-icon">🧗</div>
+        <div class="activity-details">
+          <div class="activity-name" data-i18n="app.act.a3.name">Bouldering Session — The Cave</div>
+          <div class="activity-meta" data-i18n="app.act.a3.meta">2 days ago · Climbing · V3–V5</div>
+        </div>
+        <div class="activity-stats">
+          <div><div class="act-stat-val">14</div><div class="act-stat-lbl" data-i18n="app.act.routes.lbl">routes</div></div>
+          <div><div class="act-stat-val">1:20:00</div><div class="act-stat-lbl" data-i18n="app.act.time.lbl">time</div></div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-sport-icon">🏊</div>
+        <div class="activity-details">
+          <div class="activity-name" data-i18n="app.act.a4.name">Lap Swim — Municipal Pool</div>
+          <div class="activity-meta" data-i18n="app.act.a4.meta">3 days ago · Swimming · 50m pool</div>
+        </div>
+        <div class="activity-stats">
+          <div><div class="act-stat-val">2.4 km</div><div class="act-stat-lbl" data-i18n="app.act.dist.lbl">distance</div></div>
+          <div><div class="act-stat-val">48:22</div><div class="act-stat-lbl" data-i18n="app.act.time.lbl">time</div></div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-sport-icon">🥾</div>
+        <div class="activity-details">
+          <div class="activity-name" data-i18n="app.act.a5.name">Trail Hike — North Ridge</div>
+          <div class="activity-meta" data-i18n="app.act.a5.meta">5 days ago · Hiking · 640m elevation</div>
+        </div>
+        <div class="activity-stats">
+          <div><div class="act-stat-val">12.1 km</div><div class="act-stat-lbl" data-i18n="app.act.dist.lbl">distance</div></div>
+          <div><div class="act-stat-val">3:15:00</div><div class="act-stat-lbl" data-i18n="app.act.time.lbl">time</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SYNC PAGE ─────────────────────────── -->
+  <div class="page" id="page-sync">
+    <div style="margin-bottom:1.8rem">
+      <div class="section-head" data-i18n="app.sync.head">Connected Apps</div>
+      <p style="font-size:.85rem;color:var(--text-mid);max-width:560px;line-height:1.6" data-i18n="app.sync.sub">Sync your fitness data automatically. Connect your devices and apps to pull in activities without manual logging.</p>
+    </div>
+
+    <div class="sync-grid">
+      <!-- Apple Health -->
+      <div class="sync-card connected">
+        <div class="sync-logo" style="background:#f0f0f0">🍎</div>
+        <div class="sync-name" data-i18n="app.sync.apple.name">Apple Health</div>
+        <div class="sync-desc" data-i18n="app.sync.apple.desc">Sync workouts, heart rate, and activity data directly from your iPhone or Apple Watch.</div>
+        <div class="sync-status connected"><div class="sync-dot"></div> <span data-i18n="app.sync.apple.conn">Connected · Last sync 4 min ago</span></div>
+        <button class="btn-sync disconnect" onclick="toggleSync(this, 'Apple Health')" data-i18n="app.sync.btn.disc">Disconnect</button>
+      </div>
+
+      <!-- Garmin -->
+      <div class="sync-card">
+        <div class="sync-logo" style="background:#e8f4fd">⌚</div>
+        <div class="sync-name" data-i18n="app.sync.garmin.name">Garmin Connect</div>
+        <div class="sync-desc" data-i18n="app.sync.garmin.desc">Import runs, rides, swims, and training plans from Garmin devices and the Garmin Connect platform.</div>
+        <div class="sync-status disconnected"><div class="sync-dot"></div> <span data-i18n="app.sync.disconn">Not connected</span></div>
+        <button class="btn-sync connect" onclick="toggleSync(this, 'Garmin Connect')" data-i18n="app.sync.btn.conn">Connect</button>
+      </div>
+
+      <!-- Strava -->
+      <div class="sync-card">
+        <div class="sync-logo" style="background:#fdeee8">🦅</div>
+        <div class="sync-name" data-i18n="app.sync.strava.name">Strava</div>
+        <div class="sync-desc" data-i18n="app.sync.strava.desc">Pull your existing Strava activities and kudos history into Lauver automatically.</div>
+        <div class="sync-status disconnected"><div class="sync-dot"></div> <span data-i18n="app.sync.disconn">Not connected</span></div>
+        <button class="btn-sync connect" onclick="toggleSync(this, 'Strava')" data-i18n="app.sync.btn.conn">Connect</button>
+      </div>
+
+      <!-- Fitbit -->
+      <div class="sync-card">
+        <div class="sync-logo" style="background:#e8f8f0">📟</div>
+        <div class="sync-name" data-i18n="app.sync.fitbit.name">Fitbit</div>
+        <div class="sync-desc" data-i18n="app.sync.fitbit.desc">Sync steps, sleep, heart rate, and workout data from your Fitbit tracker.</div>
+        <div class="sync-status disconnected"><div class="sync-dot"></div> <span data-i18n="app.sync.disconn">Not connected</span></div>
+        <button class="btn-sync connect" onclick="toggleSync(this, 'Fitbit')" data-i18n="app.sync.btn.conn">Connect</button>
+      </div>
+
+      <!-- Wahoo -->
+      <div class="sync-card">
+        <div class="sync-logo" style="background:#fff3e8">🚲</div>
+        <div class="sync-name" data-i18n="app.sync.wahoo.name">Wahoo</div>
+        <div class="sync-desc" data-i18n="app.sync.wahoo.desc">Connect ELEMNT bike computers and KICKR smart trainers for power data and structured workouts.</div>
+        <div class="sync-status disconnected"><div class="sync-dot"></div> <span data-i18n="app.sync.disconn">Not connected</span></div>
+        <button class="btn-sync connect" onclick="toggleSync(this, 'Wahoo')" data-i18n="app.sync.btn.conn">Connect</button>
+      </div>
+
+      <!-- Polar -->
+      <div class="sync-card">
+        <div class="sync-logo" style="background:#f0eaff">💓</div>
+        <div class="sync-name" data-i18n="app.sync.polar.name">Polar Flow</div>
+        <div class="sync-desc" data-i18n="app.sync.polar.desc">Import training data, sleep tracking, and recovery scores from Polar devices.</div>
+        <div class="sync-status disconnected"><div class="sync-dot"></div> <span data-i18n="app.sync.disconn">Not connected</span></div>
+        <button class="btn-sync connect" onclick="toggleSync(this, 'Polar Flow')" data-i18n="app.sync.btn.conn">Connect</button>
+      </div>
+    </div>
+
+    <div class="section-head" data-i18n="app.sync.hist">Sync History</div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="activity-sport-icon" style="font-size:.9rem">✅</div>
+        <div class="activity-details">
+          <div class="activity-name" data-i18n="app.sync.h1.name">Apple Health — Activities imported</div>
+          <div class="activity-meta" data-i18n="app.sync.h1.meta">Today, 9:15 am · 3 new workouts synced</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-sport-icon" style="font-size:.9rem">✅</div>
+        <div class="activity-details">
+          <div class="activity-name" data-i18n="app.sync.h2.name">Apple Health — Health data update</div>
+          <div class="activity-meta" data-i18n="app.sync.h2.meta">Yesterday, 11:30 pm · Heart rate + steps</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COMMUNITY PAGE ────────────────────── -->
+  <div class="page" id="page-community">
+    <div class="community-layout">
+      <div>
+        <!-- Compose -->
+        <div class="compose-box">
+          <div class="compose-row">
+            <div class="compose-avatar">J</div>
+            <div class="compose-input" data-i18n="app.comm.compose.ph">What's your latest achievement?</div>
+          </div>
+          <div class="compose-actions">
+            <button class="compose-action-btn" data-i18n="app.comm.act.photo">📷 Photo</button>
+            <button class="compose-action-btn" data-i18n="app.comm.act.route">📍 Route</button>
+            <button class="compose-action-btn" data-i18n="app.comm.act.act">🏃 Activity</button>
+            <button class="compose-action-btn" data-i18n="app.comm.act.goal">🎯 Goal</button>
+          </div>
+        </div>
+
+        <!-- Post 1 -->
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar" style="background:var(--orange)">M</div>
+            <div class="post-author">
+              <div class="post-author-name" data-i18n="app.comm.p1.name">Marco Oliveira</div>
+              <div class="post-time" data-i18n="app.comm.p1.time">2 hours ago · 🏃 Running</div>
+            </div>
+            <button class="post-more">•••</button>
+          </div>
+          <div class="post-body" data-i18n="app.comm.p1.body">
+            Just hit a new 10K PR — 43:21! The Riverside Trail is absolutely perfect this time of year. Anyone else running this weekend? Would love to find a pacer for Sunday's long run 🔥
+          </div>
+          <div class="post-activity">
+            <div class="post-activity-icon">🏃</div>
+            <div class="post-activity-details">
+              <div class="post-activity-name" data-i18n="app.comm.p1.act.name">Morning Run — Riverside Trail</div>
+              <div class="post-activity-stats" data-i18n="app.comm.p1.act.stat">10.0 km · 43:21 · Avg pace 4:20/km</div>
+            </div>
+          </div>
+          <div class="post-reactions">
+            <div class="reaction-pill">🔥 24</div>
+            <div class="reaction-pill">👏 8</div>
+            <div class="reaction-pill">💪 12</div>
+          </div>
+          <div class="post-actions">
+            <button class="post-action" data-i18n="app.comm.react">🔥 React</button>
+            <button class="post-action" data-i18n="app.comm.comment5">💬 Comment (5)</button>
+            <button class="post-action" data-i18n="app.comm.share">↗ Share</button>
+          </div>
+        </div>
+
+        <!-- Post 2 -->
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar" style="background:#5a9e6f">S</div>
+            <div class="post-author">
+              <div class="post-author-name" data-i18n="app.comm.p2.name">Sofia Chen</div>
+              <div class="post-time" data-i18n="app.comm.p2.time">5 hours ago · 🧗 Climbing</div>
+            </div>
+            <button class="post-more">•••</button>
+          </div>
+          <div class="post-body" data-i18n="app.comm.p2.body">
+            Finally sent that V6 I've been projecting for 3 weeks!! Technique over strength every time. Huge thanks to the Cave crew for the beta 🤜
+          </div>
+          <div class="post-reactions">
+            <div class="reaction-pill">🏆 41</div>
+            <div class="reaction-pill">💪 19</div>
+          </div>
+          <div class="post-actions">
+            <button class="post-action" data-i18n="app.comm.react">🔥 React</button>
+            <button class="post-action" data-i18n="app.comm.comment14">💬 Comment (14)</button>
+            <button class="post-action" data-i18n="app.comm.share">↗ Share</button>
+          </div>
+        </div>
+
+        <!-- Post 3 -->
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-avatar" style="background:#7b5ea7">A</div>
+            <div class="post-author">
+              <div class="post-author-name" data-i18n="app.comm.p3.name">Alex Ramos</div>
+              <div class="post-time" data-i18n="app.comm.p3.time">Yesterday · 🚴 Cycling</div>
+            </div>
+            <button class="post-more">•••</button>
+          </div>
+          <div class="post-body" data-i18n="app.comm.p3.body">
+            Organizing a group ride this Saturday — North Shore loop, ~60km with 800m elevation. Intermediate pace, all welcome. Drop a comment if you're in 🚴
+          </div>
+          <div class="post-activity">
+            <div class="post-activity-icon">🗺️</div>
+            <div class="post-activity-details">
+              <div class="post-activity-name" data-i18n="app.comm.p3.act.name">North Shore Loop — Route Preview</div>
+              <div class="post-activity-stats" data-i18n="app.comm.p3.act.stat">60 km · 800m elevation · Intermediate</div>
+            </div>
+          </div>
+          <div class="post-reactions">
+            <div class="reaction-pill">🤙 16</div>
+            <div class="reaction-pill">💬 7</div>
+          </div>
+          <div class="post-actions">
+            <button class="post-action" data-i18n="app.comm.react">🔥 React</button>
+            <button class="post-action" data-i18n="app.comm.comment7">💬 Comment (7)</button>
+            <button class="post-action" data-i18n="app.comm.share">↗ Share</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="community-sidebar">
+        <div class="sidebar-widget">
+          <div class="widget-title" data-i18n="app.comm.w.groups">Suggested Groups</div>
+          <div class="group-item">
+            <div class="group-icon">🏃</div>
+            <div>
+              <div class="group-name" data-i18n="app.comm.g1.name">City Runners Club</div>
+              <div class="group-members" data-i18n="app.comm.g1.mem">2,841 members</div>
+            </div>
+            <button class="btn-join" data-i18n="app.comm.join">Join</button>
+          </div>
+          <div class="group-item">
+            <div class="group-icon">🧗</div>
+            <div>
+              <div class="group-name" data-i18n="app.comm.g2.name">Climbing Community</div>
+              <div class="group-members" data-i18n="app.comm.g2.mem">1,203 members</div>
+            </div>
+            <button class="btn-join" data-i18n="app.comm.join">Join</button>
+          </div>
+          <div class="group-item">
+            <div class="group-icon">🚴</div>
+            <div>
+              <div class="group-name" data-i18n="app.comm.g3.name">Weekend Cyclists</div>
+              <div class="group-members" data-i18n="app.comm.g3.mem">988 members</div>
+            </div>
+            <button class="btn-join" data-i18n="app.comm.join">Join</button>
+          </div>
+          <div class="group-item">
+            <div class="group-icon">🥾</div>
+            <div>
+              <div class="group-name" data-i18n="app.comm.g4.name">Trail Hikers Network</div>
+              <div class="group-members" data-i18n="app.comm.g4.mem">3,112 members</div>
+            </div>
+            <button class="btn-join" data-i18n="app.comm.join">Join</button>
+          </div>
+        </div>
+
+        <div class="sidebar-widget">
+          <div class="widget-title" data-i18n="app.comm.w.nearby">Nearby Athletes</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.82rem">
+              <div class="post-avatar" style="width:30px;height:30px;font-size:.75rem;background:#e05a2b;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;flex-shrink:0">L</div>
+              <div><div style="font-weight:600;color:var(--text)" data-i18n="app.comm.n1.name">Lena Park</div><div style="font-size:.7rem;color:var(--text-light)" data-i18n="app.comm.n1.sub">Runner · 0.8 km away</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.82rem">
+              <div class="post-avatar" style="width:30px;height:30px;font-size:.75rem;background:#3d9970;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;flex-shrink:0">T</div>
+              <div><div style="font-weight:600;color:var(--text)" data-i18n="app.comm.n2.name">Tom Nguyen</div><div style="font-size:.7rem;color:var(--text-light)" data-i18n="app.comm.n2.sub">Cyclist · 1.2 km away</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem;font-size:.82rem">
+              <div class="post-avatar" style="width:30px;height:30px;font-size:.75rem;background:#7b5ea7;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;flex-shrink:0">R</div>
+              <div><div style="font-weight:600;color:var(--text)" data-i18n="app.comm.n3.name">Rina Sato</div><div style="font-size:.7rem;color:var(--text-light)" data-i18n="app.comm.n3.sub">Climber · 2.1 km away</div></div>
+            </div>
+          </div>
+          <button onclick="navigate('match')" style="width:100%;margin-top:.9rem;background:transparent;border:1.5px solid var(--border);color:var(--text-mid);padding:.45rem;border-radius:.4rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-mid)'" data-i18n="app.comm.find.more">Find more athletes →</button>
+        </div>
+
+        <div class="sidebar-widget">
+          <div class="widget-title" data-i18n="app.comm.w.events">Upcoming Events</div>
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <div>
+              <div style="font-size:.82rem;font-weight:700;color:var(--text)" data-i18n="app.comm.e1.name">City 10K Race</div>
+              <div style="font-size:.72rem;color:var(--text-light)" data-i18n="app.comm.e1.sub">Sat Apr 5 · 500 going</div>
+            </div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;color:var(--text)" data-i18n="app.comm.e2.name">Sunday Group Ride</div>
+              <div style="font-size:.72rem;color:var(--text-light)" data-i18n="app.comm.e2.sub">Sun Apr 6 · 18 going</div>
+            </div>
+            <div>
+              <div style="font-size:.82rem;font-weight:700;color:var(--text)" data-i18n="app.comm.e3.name">Bouldering Comp</div>
+              <div style="font-size:.72rem;color:var(--text-light)" data-i18n="app.comm.e3.sub">Sat Apr 12 · 72 going</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MATCHING PAGE ─────────────────────── -->
+  <div class="page" id="page-match">
+    <!-- Gated state (profile incomplete) -->
+    <div class="match-gate" id="match-gate">
+      <div class="gate-icon" data-i18n="app.match.gate.icon">🔒</div>
+      <div class="gate-title" data-i18n="app.match.gate.h">Unlock Athlete Matching</div>
+      <div class="gate-sub" data-i18n="app.match.gate.sub">Complete your profile to start finding training partners who match your sports, pace, and schedule.</div>
+      <div class="progress-checklist">
+        <div class="check-item done">
+          <div class="check-circle">✓</div>
+          <span data-i18n="app.match.c1.done">Account created</span>
+        </div>
+        <div class="check-item done">
+          <div class="check-circle">✓</div>
+          <span data-i18n="app.match.c2.done">Email verified</span>
+        </div>
+        <div class="check-item pending">
+          <div class="check-circle">·</div>
+          <span data-i18n="app.match.c3.todo">Profile photo uploaded</span>
+        </div>
+        <div class="check-item pending">
+          <div class="check-circle">·</div>
+          <span data-i18n="app.match.c4.todo">Sports & skill level set</span>
+        </div>
+        <div class="check-item pending">
+          <div class="check-circle">·</div>
+          <span data-i18n="app.match.c5.todo">Location & availability filled in</span>
+        </div>
+      </div>
+      <button class="btn-complete-profile" onclick="navigate('profile')" data-i18n="app.match.complete">Complete My Profile</button>
+      <div style="margin-top:1rem;font-size:.75rem;color:var(--text-light)"><span data-i18n="app.match.preview">or</span> <a style="color:var(--orange);font-weight:700;cursor:pointer" onclick="unlockMatching()" data-i18n="app.match.preview.a">preview matching (demo)</a></div>
+    </div>
+
+    <!-- Unlocked matching UI (hidden until profile completed or demo click) -->
+    <div class="match-layout" id="match-layout">
+      <div class="tinder-stack">
+        <div style="margin-bottom:1rem;text-align:center">
+          <div class="section-head" style="margin-bottom:.2rem" data-i18n="app.match.head">Find Your Training Partner</div>
+          <p style="font-size:.82rem;color:var(--text-mid)" data-i18n="app.match.sub">8 athletes near you match your sports</p>
+        </div>
+        <div class="card-stack-wrap">
+          <!-- Card 3 (back) -->
+          <div class="match-card">
+            <div class="match-card-photo">🏋️</div>
+            <div class="match-card-body">
+              <div class="match-card-name" data-i18n="app.card.chris.name">Chris Park</div>
+              <div class="match-card-location" data-i18n="app.card.chris.loc">📍 2.4 km away · 28</div>
+              <div class="match-sports">
+                <span class="sport-tag">🏋️ Lifting</span>
+                <span class="sport-tag">🏃 Running</span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 2 (middle) -->
+          <div class="match-card">
+            <div class="match-card-photo">🚴</div>
+            <div class="match-card-body">
+              <div class="match-card-name" data-i18n="app.card.priya.name">Priya Mehta</div>
+              <div class="match-card-location" data-i18n="app.card.priya.loc">📍 1.8 km away · 31</div>
+              <div class="match-sports">
+                <span class="sport-tag">🚴 Cycling</span>
+                <span class="sport-tag">🏊 Swimming</span>
+                <span class="sport-tag">🤸 Yoga</span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 1 (top) -->
+          <div class="match-card">
+            <div class="match-card-photo">🏃</div>
+            <div class="match-card-body">
+              <div class="match-card-name" data-i18n="app.card.marco.name">Marco Oliveira</div>
+              <div class="match-card-location" data-i18n="app.card.marco.loc">📍 0.6 km away · 29</div>
+              <div class="match-sports">
+                <span class="sport-tag">🏃 Running</span>
+                <span class="sport-tag">🥾 Hiking</span>
+                <span class="sport-tag">🧗 Climbing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="swipe-buttons">
+          <button class="swipe-btn pass" title="Pass">✕</button>
+          <button class="swipe-btn super" title="Super Like">⭐</button>
+          <button class="swipe-btn like" title="Like">♥</button>
+        </div>
+      </div>
+
+      <!-- Filters panel -->
+      <div class="match-filters">
+        <div class="widget-title" data-i18n="app.match.filters">Match Filters</div>
+        <div class="filter-label" data-i18n="app.match.f.sports">Sports</div>
+        <div class="filter-chips">
+          <button class="filter-chip active">🏃 Running</button>
+          <button class="filter-chip active">🚴 Cycling</button>
+          <button class="filter-chip">🧗 Climbing</button>
+          <button class="filter-chip">🏊 Swimming</button>
+          <button class="filter-chip">🥾 Hiking</button>
+          <button class="filter-chip">🤸 Yoga</button>
+        </div>
+
+        <div class="filter-label" data-i18n="app.match.f.dist">Max Distance</div>
+        <input type="range" class="range-slider" min="1" max="50" value="10">
+        <div class="range-labels"><span data-i18n="app.match.range1">1 km</span><span data-i18n="app.match.range2">10 km</span><span data-i18n="app.match.range3">50 km</span></div>
+
+        <div class="filter-label" data-i18n="app.match.f.skill">Skill Level</div>
+        <div class="filter-chips">
+          <button class="filter-chip" data-i18n="app.match.f.beg">Beginner</button>
+          <button class="filter-chip active" data-i18n="app.match.f.int">Intermediate</button>
+          <button class="filter-chip active" data-i18n="app.match.f.adv">Advanced</button>
+        </div>
+
+        <div class="filter-label" data-i18n="app.match.f.avail">Availability</div>
+        <div class="filter-chips">
+          <button class="filter-chip active" data-i18n="app.match.f.wknd">Weekends</button>
+          <button class="filter-chip" data-i18n="app.match.f.wkdy">Weekdays</button>
+          <button class="filter-chip" data-i18n="app.match.f.morn">Mornings</button>
+          <button class="filter-chip active" data-i18n="app.match.f.eve">Evenings</button>
+        </div>
+
+        <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <div class="widget-title" style="margin-bottom:.7rem" data-i18n="app.match.yours">Your Matches</div>
+          <div style="font-size:.82rem;color:var(--text-mid);margin-bottom:.8rem" data-i18n="app.match.yours.sub">Complete your profile to see mutual matches.</div>
+          <div style="display:flex;gap:.5rem">
+            <div style="width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:.95rem;color:white">M</div>
+            <div style="width:42px;height:42px;border-radius:50%;background:#5a9e6f;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:.95rem;color:white">S</div>
+            <div style="width:42px;height:42px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--text-light)">+5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROFILE PAGE ───────────────────────── -->
+  <div class="page" id="page-profile">
+    <div class="profile-layout">
+      <!-- Left: Progress card -->
+      <div class="profile-sidebar-card">
+        <div class="profile-photo-area">
+          <div class="upload-icon">📷</div>
+          <div class="upload-text" data-i18n="app.prof.upload">Upload photo</div>
+        </div>
+        <div class="profile-progress-wrap">
+          <div class="progress-header">
+            <span class="progress-label" data-i18n="app.prof.prog.lbl">Profile Complete</span>
+            <span class="progress-pct" id="profile-pct">40%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="profile-bar" style="width:40%"></div>
+          </div>
+          <div class="profile-checklist">
+            <div class="profile-check done"><div class="profile-check-dot"></div><span data-i18n="app.prof.c.account">Account created</span></div>
+            <div class="profile-check done"><div class="profile-check-dot"></div><span data-i18n="app.prof.c.email">Email verified</span></div>
+            <div class="profile-check todo" id="check-photo"><div class="profile-check-dot"></div><span data-i18n="app.prof.c.photo">Profile photo</span></div>
+            <div class="profile-check todo" id="check-sports"><div class="profile-check-dot"></div><span data-i18n="app.prof.c.sports">Sports selected</span></div>
+            <div class="profile-check todo" id="check-location"><div class="profile-check-dot"></div><span data-i18n="app.prof.c.loc">Location set</span></div>
+            <div class="profile-check todo" id="check-bio"><div class="profile-check-dot"></div><span data-i18n="app.prof.c.bio">Bio written</span></div>
+            <div class="profile-check todo" id="check-avail"><div class="profile-check-dot"></div><span data-i18n="app.prof.c.avail">Availability set</span></div>
+          </div>
+          <div class="match-unlock-badge" id="unlock-badge" data-i18n="app.prof.lock.msg">
+            🔒 Complete 100% to unlock athlete matching
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Form sections -->
+      <div class="profile-form">
+
+        <div class="form-section">
+          <div class="form-section-title" data-i18n="app.prof.s1.title">Basic Info</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.fname">First Name</label>
+              <input class="form-input" type="text" placeholder="Jane" value="Jane">
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.lname">Last Name</label>
+              <input class="form-input" type="text" placeholder="Smith" value="Smith">
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.age">Age</label>
+              <input class="form-input" type="number" placeholder="28">
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.gender">Gender</label>
+              <select class="form-select">
+                <option value="">Select…</option>
+                <option>Female</option>
+                <option>Male</option>
+                <option>Non-binary</option>
+                <option>Prefer not to say</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label class="form-label" data-i18n="app.prof.bio">Bio</label>
+              <textarea class="form-textarea" id="bio-input" placeholder="Tell athletes about yourself — your experience, goals, what you're looking for in a training partner…" oninput="checkFields()"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title" data-i18n="app.prof.s2.title">Location & Availability</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.city">City</label>
+              <input class="form-input" type="text" id="city-input" placeholder="San Francisco" oninput="checkFields()">
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.radius">Search Radius</label>
+              <select class="form-select">
+                <option>5 km</option>
+                <option selected>10 km</option>
+                <option>25 km</option>
+                <option>50 km</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label class="form-label" style="margin-bottom:.5rem" data-i18n="app.prof.avail">Availability</label>
+              <div class="filter-chips" id="avail-chips">
+                <button class="filter-chip" onclick="toggleChip(this,'avail')">Early Mornings</button>
+                <button class="filter-chip" onclick="toggleChip(this,'avail')">Mornings</button>
+                <button class="filter-chip" onclick="toggleChip(this,'avail')">Evenings</button>
+                <button class="filter-chip" onclick="toggleChip(this,'avail')">Weekends</button>
+                <button class="filter-chip" onclick="toggleChip(this,'avail')">Flexible</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title" data-i18n="app.prof.s3.title">Sports & Skill Level</div>
+          <div class="form-field" style="margin-bottom:1rem">
+            <label class="form-label" style="margin-bottom:.5rem" data-i18n="app.prof.sports.lbl">Your Sports</label>
+            <div class="sport-picker" id="sport-picker">
+              <button class="sport-pick-btn selected" onclick="toggleSport(this)">🏃 Running</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🚴 Cycling</button>
+              <button class="sport-pick-btn selected" onclick="toggleSport(this)">🧗 Climbing</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🏊 Swimming</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🥾 Hiking</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🤸 Yoga</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">⛷️ Skiing</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🏋️ Lifting</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🏸 Badminton</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🎾 Tennis</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">⛹️ Basketball</button>
+              <button class="sport-pick-btn" onclick="toggleSport(this)">🏄 Surfing</button>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.skill">Overall Skill Level</label>
+              <select class="form-select">
+                <option>Beginner</option>
+                <option selected>Intermediate</option>
+                <option>Advanced</option>
+                <option>Elite / Competitive</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" data-i18n="app.prof.looking">Looking For</label>
+              <select class="form-select">
+                <option>Training Partner</option>
+                <option selected>Group & Partners</option>
+                <option>Running Buddy</option>
+                <option>Coach / Mentor</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title" data-i18n="app.prof.s4.title">Identity Verification</div>
+          <div class="verify-box">
+            <div class="verify-text">
+              <h4 data-i18n="app.prof.verify.h">Verify your identity</h4>
+              <p data-i18n="app.prof.verify.p">Required to enable athlete matching. Upload a government ID or use selfie verification.</p>
+            </div>
+            <button class="btn-verify" data-i18n="app.prof.verify.btn">Verify Now</button>
+          </div>
+        </div>
+
+        <button class="btn-publish" onclick="publishProfile()" data-i18n="app.prof.publish">Publish Profile & Unlock Matching →</button>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- end app-main -->
+
+<script>
+  // ── State ────────────────────────────────────
+  let currentPage = 'dashboard';
+  const pageTitles = {
+    dashboard: 'Dashboard',
+    activities: 'Activities',
+    sync: 'Connect Apps',
+    community: 'Community',
+    match: 'Find Athletes',
+    profile: 'My Profile',
+  };
+
+  // ── Navigation ───────────────────────────────
+  function navigate(page) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+    // Show target
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelector('[data-page="' + page + '"]').classList.add('active');
+    document.getElementById('page-title').textContent = pageTitles[page] || page;
+    currentPage = page;
+
+    // Close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+
+    // Update log activity button visibility
+    const logBtn = document.querySelector('.topbar-btn.primary');
+    logBtn.style.display = (page === 'activities') ? 'inline-flex' : 'inline-flex';
+  }
+
+  // Nav item clicks
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => navigate(item.dataset.page));
+  });
+
+  // Mobile toggle
+  document.getElementById('topbar-toggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebar-overlay').classList.toggle('open');
+  });
+  document.getElementById('sidebar-overlay').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+  });
+
+  // ── Sync toggle ──────────────────────────────
+  function toggleSync(btn, name) {
+    const card = btn.closest('.sync-card');
+    const statusEl = card.querySelector('.sync-status');
+    const isConnected = card.classList.contains('connected');
+
+    if (isConnected) {
+      card.classList.remove('connected');
+      statusEl.className = 'sync-status disconnected';
+      statusEl.innerHTML = '<div class="sync-dot"></div> Not connected';
+      btn.className = 'btn-sync connect';
+      btn.textContent = 'Connect';
+    } else {
+      card.classList.add('connected');
+      statusEl.className = 'sync-status connected';
+      statusEl.innerHTML = '<div class="sync-dot"></div> Connected · Last sync just now';
+      btn.className = 'btn-sync disconnect';
+      btn.textContent = 'Disconnect';
+    }
+  }
+
+  // ── Filter chips ─────────────────────────────
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('active'));
+  });
+
+  function toggleChip(el) {
+    el.classList.toggle('active');
+    checkFields();
+  }
+
+  // ── Sport picker ─────────────────────────────
+  function toggleSport(btn) {
+    btn.classList.toggle('selected');
+    checkFields();
+  }
+
+  // ── Profile progress ─────────────────────────
+  function checkFields() {
+    const hasBio    = document.getElementById('bio-input').value.trim().length > 10;
+    const hasCity   = document.getElementById('city-input').value.trim().length > 1;
+    const hasAvail  = document.querySelectorAll('#avail-chips .active').length > 0;
+    const hasSports = document.querySelectorAll('#sport-picker .selected').length > 0;
+
+    setCheck('check-bio',      hasBio);
+    setCheck('check-location', hasCity);
+    setCheck('check-avail',    hasAvail);
+    setCheck('check-sports',   hasSports);
+
+    const total = [true, true, false, hasSports, hasCity, hasBio, hasAvail];
+    const done  = total.filter(Boolean).length;
+    const pct   = Math.round(done / total.length * 100);
+    document.getElementById('profile-pct').textContent = pct + '%';
+    document.getElementById('profile-bar').style.width = pct + '%';
+
+    const badge = document.getElementById('unlock-badge');
+    if (pct >= 100) {
+      badge.innerHTML = '✅ Profile ready — matching unlocked!';
+      badge.style.background = 'color-mix(in oklch, var(--green) 10%, var(--bg))';
+      badge.style.borderColor = 'color-mix(in oklch, var(--green) 30%, transparent)';
+      badge.style.color = 'var(--green)';
+    } else {
+      badge.innerHTML = '🔒 Complete 100% to unlock athlete matching';
+      badge.style.background = '';
+      badge.style.borderColor = '';
+      badge.style.color = '';
+    }
+  }
+
+  function setCheck(id, done) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = done ? 'profile-check done' : 'profile-check todo';
+  }
+
+  // ── Matching unlock ──────────────────────────
+  function unlockMatching() {
+    document.getElementById('match-gate').style.display = 'none';
+    document.getElementById('match-layout').classList.add('visible');
+  }
+
+  function publishProfile() {
+    // Simulate saving
+    const btn = document.querySelector('.btn-publish');
+    btn.textContent = 'Saving…';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '✅ Profile Published!';
+      btn.style.background = 'var(--green)';
+      // Navigate to matching
+      setTimeout(() => {
+        navigate('match');
+        unlockMatching();
+      }, 800);
+    }, 1000);
+  }
+
+  // ── Init ─────────────────────────────────────
+  checkFields();
+</script>
+<script type="module">
+  import { initI18n } from '/src/i18n.js';
+  initI18n();
+</script>
+</body>
+</html>

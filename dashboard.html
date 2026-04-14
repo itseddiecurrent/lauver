@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Lauver.ai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          oklch(99% 0.007 75);
+      --surface:     oklch(96% 0.015 72);
+      --border:      oklch(90% 0.022 70);
+      --orange:      oklch(63% 0.22 43);
+      --orange-dark: oklch(29% 0.16 42);
+      --yellow:      oklch(80% 0.19 80);
+      --text:        oklch(16% 0.04 45);
+      --text-mid:    oklch(40% 0.06 48);
+      --text-light:  oklch(62% 0.04 50);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ─────────────────────────────────── */
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .nav-logo img { height: 44px; width: auto; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-home {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-size: .83rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      transition: color .2s;
+    }
+    .nav-home:hover { color: var(--orange); }
+    .btn-signout {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-mid);
+      padding: .45rem 1.1rem;
+      border-radius: 2rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-signout:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* ── MAIN ────────────────────────────────── */
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+    }
+
+    /* ── USER CARD ───────────────────────────── */
+    .user-card {
+      background: var(--orange-dark);
+      border-radius: 1.25rem;
+      padding: 2.5rem 3rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .user-card::before {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border: 1.5px solid color-mix(in oklch, var(--yellow) 15%, transparent);
+      border-radius: 50%;
+      right: -80px; top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .avatar-wrap {
+      flex-shrink: 0;
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: color-mix(in oklch, var(--yellow) 20%, transparent);
+      border: 2px solid color-mix(in oklch, var(--yellow) 40%, transparent);
+      overflow: hidden;
+      position: relative;
+    }
+    .avatar-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .avatar-fallback {
+      display: none;
+      width: 100%; height: 100%;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--yellow);
+    }
+    .user-info { flex: 1; position: relative; z-index: 2; }
+    .user-greeting {
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: oklch(70% 0.04 62);
+      margin-bottom: .3rem;
+    }
+    .user-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 2rem;
+      text-transform: uppercase;
+      color: var(--bg);
+      line-height: 1;
+      margin-bottom: .35rem;
+    }
+    .user-email {
+      font-size: .85rem;
+      color: oklch(72% 0.03 60);
+    }
+    .provider-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      background: color-mix(in oklch, var(--yellow) 15%, transparent);
+      border: 1px solid color-mix(in oklch, var(--yellow) 25%, transparent);
+      color: oklch(80% 0.04 68);
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .2rem .6rem;
+      border-radius: 2rem;
+      margin-top: .5rem;
+    }
+
+    /* ── SECTION LABEL ───────────────────────── */
+    .section-head {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      margin-bottom: 1rem;
+      letter-spacing: .02em;
+    }
+
+    /* ── COMING SOON CARDS ───────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.6rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::after {
+      content: 'COMING SOON';
+      position: absolute;
+      top: .75rem; right: .75rem;
+      font-size: .55rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: var(--orange);
+      background: color-mix(in oklch, var(--orange) 10%, var(--bg));
+      border: 1px solid color-mix(in oklch, var(--orange) 25%, transparent);
+      padding: .15rem .5rem;
+      border-radius: 2rem;
+    }
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      margin-bottom: .35rem;
+      letter-spacing: .03em;
+    }
+    .card-desc {
+      font-size: .8rem;
+      color: var(--text-mid);
+      line-height: 1.55;
+    }
+
+    /* ── WAITLIST BANNER ─────────────────────── */
+    .waitlist-banner {
+      background: color-mix(in oklch, var(--yellow) 14%, var(--bg));
+      border: 1.5px solid color-mix(in oklch, var(--yellow) 35%, transparent);
+      border-radius: 1rem;
+      padding: 1.8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .waitlist-text h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      margin-bottom: .25rem;
+    }
+    .waitlist-text p {
+      font-size: .85rem;
+      color: var(--text-mid);
+    }
+    .waitlist-spot {
+      background: var(--orange);
+      color: var(--bg);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: .7rem 1.8rem;
+      border-radius: 2rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .user-card { flex-direction: column; align-items: flex-start; padding: 1.8rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+      nav { padding: 1rem 1.2rem; }
+      main { padding: 2rem 1.2rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────── -->
+<nav>
+  <a href="/" class="nav-logo"><img src="/lauver-logo.png" alt="Lauver.ai"></a>
+  <div class="nav-right">
+    <a href="/" class="nav-home" data-i18n="nav.home">← Home</a>
+    <button class="lang-toggle-btn" style="background:transparent;border:1.5px solid var(--border);color:var(--text-mid);padding:.4rem .85rem;border-radius:2rem;font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s">中文</button>
+    <button class="btn-signout" id="btn-signout" data-i18n="nav.signout">Sign Out</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ─────────────────────────────────── -->
+<main>
+
+  <!-- User Card -->
+  <div class="user-card">
+    <div class="avatar-wrap">
+      <img id="user-avatar" src="" alt="Avatar" style="display:none">
+      <div class="avatar-fallback" id="user-avatar-fallback"></div>
+    </div>
+    <div class="user-info">
+      <div class="user-greeting" data-i18n="dash.greeting">Welcome back, athlete</div>
+      <div class="user-name" id="user-name" data-i18n="dash.loading">Loading…</div>
+      <div class="user-email" id="user-email"></div>
+      <div class="provider-badge" id="provider-badge"></div>
+    </div>
+  </div>
+
+  <!-- Coming Soon Features -->
+  <div class="section-head" data-i18n="dash.section.build">Your Pack is Being Built</div>
+  <div class="cards-grid">
+    <div class="feature-card">
+      <span class="card-icon">🤖</span>
+      <div class="card-title" data-i18n="dash.feat.ai.t">AI Matching</div>
+      <div class="card-desc" data-i18n="dash.feat.ai.d">Smart partner and community matching based on your sports, schedule, and pace.</div>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">📍</span>
+      <div class="card-title" data-i18n="dash.feat.track.t">Activity Tracking</div>
+      <div class="card-desc" data-i18n="dash.feat.track.d">GPS-powered logging for 50+ sports. Runs, rides, climbs, swims — all in one place.</div>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">🌿</span>
+      <div class="card-title" data-i18n="dash.feat.feed.t">Community Feed</div>
+      <div class="card-desc" data-i18n="dash.feat.feed.d">A social feed that actually makes sense — organized by sport, not algorithm noise.</div>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">🗺️</span>
+      <div class="card-title" data-i18n="dash.feat.route.t">Route Discovery</div>
+      <div class="card-desc" data-i18n="dash.feat.route.d">Crowdsourced routes from real athletes near you. Find the trails others aren't sharing.</div>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">🏆</span>
+      <div class="card-title" data-i18n="dash.feat.chal.t">Challenges</div>
+      <div class="card-desc" data-i18n="dash.feat.chal.d">Join community challenges or create personal goals with accountability partners.</div>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">📊</span>
+      <div class="card-title" data-i18n="dash.feat.perf.t">Performance AI</div>
+      <div class="card-desc" data-i18n="dash.feat.perf.d">Training load, recovery signals, and progression insights from your own data.</div>
+    </div>
+  </div>
+
+  <!-- Waitlist Banner -->
+  <div class="waitlist-banner">
+    <div class="waitlist-text">
+      <h3 data-i18n="dash.waitlist.h">You're on the early access list</h3>
+      <p data-i18n="dash.waitlist.p">We'll notify you as soon as your features are ready. You're one of the first.</p>
+    </div>
+    <div class="waitlist-spot" data-i18n="dash.waitlist.btn">🔥 Early Access Secured</div>
+  </div>
+
+</main>
+
+<script type="module">
+  import { initI18n } from '/src/i18n.js';
+  import '/src/dashboard.js';
+  initI18n();
+</script>
+</body>
+</html>
