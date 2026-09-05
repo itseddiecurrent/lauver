@@ -81,6 +81,7 @@
       transition: background .2s !important;
     }
     .nav-cta:hover { background: var(--yellow) !important; color: var(--orange-dark) !important; }
+    .nav-mobile-cta { display: none; }
 
     /* ── HERO ─────────────────────────────────── */
     .hero {
@@ -357,6 +358,97 @@
       color: var(--text-mid);
       max-width: 500px;
       line-height: 1.65;
+    }
+
+    /* ── WAITLIST ──────────────────────────────── */
+    .waitlist {
+      background: var(--yellow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+    .waitlist::after {
+      content: '';
+      position: absolute;
+      width: 24rem;
+      height: 24rem;
+      right: -10rem;
+      bottom: -15rem;
+      border: 1.5px solid color-mix(in oklch, var(--orange) 20%, transparent);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .waitlist-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr);
+      align-items: center;
+      gap: clamp(2.5rem, 7vw, 6rem);
+      position: relative;
+      z-index: 1;
+    }
+    .waitlist-copy .section-title { max-width: 620px; }
+    .waitlist-copy .section-subtitle { margin-top: 1rem; }
+    .waitlist-card {
+      background: var(--orange-dark);
+      padding: clamp(1.5rem, 4vw, 2.4rem);
+      border-radius: 1rem;
+      box-shadow: 0 18px 50px oklch(29% 0.16 42 / .16);
+    }
+    .waitlist-card label { color: var(--yellow-soft); }
+    .waitlist-form-fields {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: .75rem;
+      align-items: end;
+    }
+    .waitlist-card input {
+      width: 100%;
+      min-height: 50px;
+      background: var(--bg);
+      border-color: transparent;
+      color: var(--text);
+    }
+    .waitlist-card input::placeholder { color: var(--text-light); }
+    .waitlist-card input:focus { border-color: var(--yellow); }
+    .waitlist-submit {
+      min-height: 50px;
+      border: none;
+      border-radius: 3rem;
+      padding: .85rem 1.4rem;
+      background: var(--yellow);
+      color: var(--orange-dark);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .86rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+    .waitlist-submit:hover { background: var(--bg); transform: translateY(-2px); }
+    .waitlist-submit:disabled { opacity: .65; cursor: wait; transform: none; }
+    .waitlist-consent {
+      margin-top: .85rem;
+      color: oklch(75% 0.035 65);
+      font-size: .72rem;
+      line-height: 1.55;
+    }
+    .waitlist-status {
+      margin-top: .85rem;
+      padding: .65rem .8rem;
+      border-radius: .4rem;
+      font-size: .78rem;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .waitlist-status:empty { display: none; }
+    .waitlist-status.success {
+      background: color-mix(in oklch, var(--yellow) 14%, transparent);
+      color: var(--yellow);
+    }
+    .waitlist-status.error {
+      background: oklch(56% 0.19 25 / .2);
+      color: oklch(85% 0.08 25);
     }
 
     /* ── ABOUT ────────────────────────────────── */
@@ -679,7 +771,7 @@
 
     /* ── RESPONSIVE ───────────────────────────── */
     @media (max-width: 900px) {
-      .about-inner, .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .about-inner, .contact-inner, .waitlist-inner { grid-template-columns: 1fr; gap: 3rem; }
       .match-inner { grid-template-columns: 1fr; gap: 3rem; }
       .features-grid { grid-template-columns: 1fr 1fr; }
       .match-visual { display: none; }
@@ -694,8 +786,20 @@
     }
     @media (max-width: 640px) {
       nav .nav-links { display: none; }
+      .nav-mobile-cta {
+        display: inline-flex;
+        background: var(--orange);
+        color: var(--bg);
+        padding: .5rem 1rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-size: .75rem;
+        font-weight: 700;
+      }
       .features-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
+      .waitlist-form-fields { grid-template-columns: 1fr; }
+      .waitlist-submit { width: 100%; }
       .hero-stats { gap: 1.8rem; }
       .hero-visual { display: none; }
     }
@@ -712,9 +816,11 @@
     <li><a href="#about" data-i18n="nav.about">About</a></li>
     <li><a href="#features" data-i18n="nav.features">Features</a></li>
     <li><a href="#compare" data-i18n="nav.compare">Compare</a></li>
+    <li><a href="#waitlist" class="nav-cta" data-i18n="nav.waitlist">Join the waitlist</a></li>
     <li><button class="lang-toggle-btn" style="background:transparent;border:1.5px solid var(--border);color:var(--text-mid);padding:.45rem .9rem;border-radius:2rem;font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s;letter-spacing:.04em">中文</button></li>
-    <li><a href="login.html" class="nav-cta" data-i18n="nav.signin">Sign In</a></li>
+    <li><a href="login.html" data-i18n="nav.signin">Sign In</a></li>
   </ul>
+  <a href="#waitlist" class="nav-mobile-cta" data-i18n="nav.waitlist">Join the waitlist</a>
 </nav>
 
 <!-- ── HERO ──────────────────────────────────────────── -->
@@ -729,7 +835,7 @@
         Track every stride, climb, and sprint. Then let AI do what no fitness app has done before — find the athletes, partners, and communities that actually fit your life.
       </p>
       <div class="hero-actions r d3">
-        <a href="login.html" class="btn-primary" data-i18n="hero.cta1">Get Early Access →</a>
+        <a href="#waitlist" class="btn-primary" data-i18n="hero.waitlist">Join the waitlist →</a>
         <a href="app.html" class="btn-ghost" data-i18n="hero.cta2">Try the App →</a>
       </div>
       <div class="sport-tags r d4">
@@ -788,6 +894,28 @@
       <div class="stat-num" data-i18n="hero.s4.num">Built Together</div>
       <div class="stat-label" data-i18n="hero.s4.lbl">Designed for people who train better in a pack</div>
     </div>
+  </div>
+</section>
+
+<!-- ── WAITLIST ───────────────────────────────────────── -->
+<section class="waitlist" id="waitlist">
+  <div class="waitlist-inner">
+    <div class="waitlist-copy r">
+      <div class="section-label" data-i18n="waitlist.label">Early Access</div>
+      <h2 class="section-title" data-i18n-html="waitlist.title">Be First<br>Off the Line.</h2>
+      <p class="section-subtitle" data-i18n="waitlist.desc">Join the Lauver waitlist and we'll email you with product updates and an invitation when the MVP is ready.</p>
+    </div>
+    <form class="waitlist-card r d1" id="waitlist-form" novalidate>
+      <div class="waitlist-form-fields">
+        <div class="form-group">
+          <label for="waitlist-email" data-i18n="waitlist.email.label">Email address</label>
+          <input type="email" id="waitlist-email" name="email" placeholder="you@example.com" autocomplete="email" inputmode="email" data-i18n-ph="waitlist.email.ph" aria-describedby="waitlist-consent waitlist-status" required>
+        </div>
+        <button type="submit" class="waitlist-submit" data-i18n="waitlist.btn">Join the waitlist</button>
+      </div>
+      <p class="waitlist-consent" id="waitlist-consent" data-i18n="waitlist.consent">By joining, you agree to receive Lauver product updates. You can unsubscribe at any time.</p>
+      <p class="waitlist-status" id="waitlist-status" role="status" aria-live="polite"></p>
+    </form>
   </div>
 </section>
 
@@ -1186,7 +1314,9 @@
 
 <script type="module">
   import { initI18n } from '/src/i18n.js';
+  import { initWaitlistForm } from '/src/waitlist.js';
   initI18n();
+  initWaitlistForm();
 </script>
 <script>
   const revealEls = document.querySelectorAll('.r');

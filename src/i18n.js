@@ -11,6 +11,7 @@ const T = {
     'nav.about':       'About',
     'nav.features':    'Features',
     'nav.compare':     'Compare',
+    'nav.waitlist':    'Join the waitlist',
     'nav.signin':      'Sign In',
     'nav.home':        '← Home',
     'nav.signout':     'Sign Out',
@@ -21,6 +22,7 @@ const T = {
     'hero.h1':         'Find<br>Your<br><span class="accent">Pack.</span>',
     'hero.sub':        'Track every stride, climb, and sprint. Then let AI do what no fitness app has done before — find the athletes, partners, and communities that actually fit your life.',
     'hero.cta1':       'Get Early Access →',
+    'hero.waitlist':   'Join the waitlist →',
     'hero.cta2':       'Try the App →',
     'hero.tag.run':    '🏃 Running',
     'hero.tag.cycle':  '🚴 Cycling',
@@ -45,6 +47,18 @@ const T = {
     'hero.s3.lbl':     'Early members shape the product with feedback',
     'hero.s4.num':     'Built Together',
     'hero.s4.lbl':     'Designed for people who train better in a pack',
+
+    /* ── Index: Waitlist ── */
+    'waitlist.label':       'Early Access',
+    'waitlist.title':       'Be First<br>Off the Line.',
+    'waitlist.desc':        'Join the Lauver waitlist and we\'ll email you with product updates and an invitation when the MVP is ready.',
+    'waitlist.email.label': 'Email address',
+    'waitlist.email.ph':    'you@example.com',
+    'waitlist.btn':         'Join the waitlist',
+    'waitlist.sending':     'Joining…',
+    'waitlist.success':     'You’re on the list—we’ll let you know when Lauver is ready.',
+    'waitlist.error':       'We couldn’t add you right now. Please try again.',
+    'waitlist.consent':     'By joining, you agree to receive Lauver product updates. You can unsubscribe at any time.',
 
     /* ── Index: About ── */
     'about.label':     'About Lauver.ai',
@@ -435,6 +449,7 @@ const T = {
     'nav.about':       '关于',
     'nav.features':    '功能',
     'nav.compare':     '对比',
+    'nav.waitlist':    '加入候补名单',
     'nav.signin':      '登录',
     'nav.home':        '← 首页',
     'nav.signout':     '退出登录',
@@ -445,6 +460,7 @@ const T = {
     'hero.h1':         '找到<br>你的<br><span class="accent">战队。</span>',
     'hero.sub':        '记录每一步奔跑、攀登与冲刺。让 AI 做健身应用从未做到的事——找到真正融入你生活的运动伙伴、训练搭档和圈子。',
     'hero.cta1':       '立即申请早期访问 →',
+    'hero.waitlist':   '加入候补名单 →',
     'hero.cta2':       '体验应用 →',
     'hero.tag.run':    '🏃 跑步',
     'hero.tag.cycle':  '🚴 骑行',
@@ -469,6 +485,18 @@ const T = {
     'hero.s3.lbl':     '早期成员用反馈共同打磨产品',
     'hero.s4.num':     '共同构建',
     'hero.s4.lbl':     '为那些在团队中训练更好的人而设计',
+
+    /* ── Index: Waitlist ── */
+    'waitlist.label':       '抢先体验',
+    'waitlist.title':       '第一时间，<br>抢先出发。',
+    'waitlist.desc':        '加入 Lauver 候补名单，我们会向你发送产品动态，并在 MVP 准备就绪时发送邀请。',
+    'waitlist.email.label': '邮箱地址',
+    'waitlist.email.ph':    'you@example.com',
+    'waitlist.btn':         '加入候补名单',
+    'waitlist.sending':     '正在加入…',
+    'waitlist.success':     '你已加入候补名单——Lauver 准备就绪时，我们会第一时间通知你。',
+    'waitlist.error':       '暂时无法加入，请稍后重试。',
+    'waitlist.consent':     '加入即表示你同意接收 Lauver 产品动态。你可以随时取消订阅。',
 
     /* ── Index: About ── */
     'about.label':     '关于 Lauver.ai',
@@ -1006,6 +1034,10 @@ function applyLang(lang) {
 // ── Public API ───────────────────────────────────────────
 export function getLang() {
   return localStorage.getItem('lauver-lang') || 'en';
+}
+
+export function translate(key, lang = getLang()) {
+  return (T[lang] || T.en)[key] ?? T.en[key] ?? key;
 }
 
 export function toggleLang() {
